@@ -8,7 +8,6 @@ func NewCommand() *cobra.Command {
 		Short: "Grade registerd",
 	}
 
-	// cmd.AddCommand(initConfigCommand())
 	cmd.AddCommand(initListCommand())
 
 	return &cmd

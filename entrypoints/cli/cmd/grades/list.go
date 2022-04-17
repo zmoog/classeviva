@@ -37,7 +37,6 @@ func runListCommand(cmd *cobra.Command, args []string) error {
 
 	sort.Sort(ByDate(grades))
 
-	// fmt.Printf("%#v\n", grades[:3])
 	output, _ := json.MarshalIndent(grades[:3], "", "  ")
 	fmt.Println(string(output))
 

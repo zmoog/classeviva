@@ -24,7 +24,6 @@ type Identity struct {
 }
 
 func From(username, password string) (Client, error) {
-
 	client := Client{
 		headers: map[string]string{
 			"User-Agent":   "zorro/1.0",
@@ -54,7 +53,6 @@ type Client struct {
 
 func (c Client) List() ([]Grade, error) {
 	url := baseUrl + "/students/" + c.identity.ID + "/grades"
-	// fmt.Println(url)
 
 	req, err := c.newRequest("GET", url, nil)
 	if err != nil {
@@ -75,7 +73,6 @@ func (c Client) List() ([]Grade, error) {
 	if err != nil {
 		return []Grade{}, err
 	}
-	// fmt.Println(string(body))
 
 	envelope := map[string][]Grade{}
 
@@ -101,7 +98,6 @@ func (c Client) newRequest(method, url string, body io.Reader) (*http.Request, e
 }
 
 func (c Client) getIdentity(username, password string) (Identity, error) {
-
 	creds := map[string]string{
 		"uid":  username,
 		"pass": password,
