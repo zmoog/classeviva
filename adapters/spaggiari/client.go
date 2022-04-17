@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 )
 
 const (
@@ -14,6 +15,7 @@ const (
 
 type Identity struct {
 	Ident     string `json:"ident"`
+	ID        string
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 	Token     string `json:"token"`
@@ -29,7 +31,8 @@ func From(username, password string) (Client, error) {
 			"Z-Dev-Apikey": "+zorro+",
 			"Content-Type": "application/json",
 		},
-		client: &http.Client{},
+		client:   &http.Client{},
+		identity: Identity{},
 	}
 
 	identity, err := client.getIdentity(username, password)
@@ -38,13 +41,50 @@ func From(username, password string) (Client, error) {
 	}
 
 	client.headers["Z-Auth-Token"] = identity.Token
+	client.identity = identity
 
 	return client, nil
 }
 
 type Client struct {
-	headers map[string]string
-	client  *http.Client
+	headers  map[string]string
+	client   *http.Client
+	identity Identity
+}
+
+func (c Client) List() ([]Grade, error) {
+	url := baseUrl + "/students/" + c.identity.ID + "/grades"
+	// fmt.Println(url)
+
+	req, err := c.newRequest("GET", url, nil)
+	if err != nil {
+		return []Grade{}, err
+	}
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return []Grade{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return []Grade{}, fmt.Errorf("failed to fetch grades, status_code: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return []Grade{}, err
+	}
+	// fmt.Println(string(body))
+
+	envelope := map[string][]Grade{}
+
+	err = json.Unmarshal(body, &envelope)
+	if err != nil {
+		return []Grade{}, err
+	}
+
+	return envelope["grades"], nil
 }
 
 func (c Client) newRequest(method, url string, body io.Reader) (*http.Request, error) {
@@ -96,6 +136,18 @@ func (c Client) getIdentity(username, password string) (Identity, error) {
 	if err != nil {
 		return Identity{}, err
 	}
+
+	// The identity ID is made of the `ident` without the leading
+	// and trailing characters.
+	// For example, with
+	//   `ident = G9123456R`
+	//   `id = 9123456`
+	// without the leading `G` and the trailing `R`.
+	//
+	// The ID is required to make calls to other endpoints, like grades,
+	// agenda, and so on.
+	m := regexp.MustCompile("\\D")
+	identity.ID = m.ReplaceAllString(identity.Ident, "")
 
 	return identity, nil
 }
