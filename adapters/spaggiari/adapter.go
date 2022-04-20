@@ -25,31 +25,21 @@ func From(username, password string) (Adapter, error) {
 	httpClient := http.Client{}
 
 	adapter := Adapter{
+		client: &httpClient,
 		headers: map[string]string{
 			"User-Agent":   "zorro/1.0",
 			"Z-Dev-Apikey": "+zorro+",
 			"Content-Type": "application/json",
 		},
-		client: &httpClient,
 		identityProvider: IdentityProvider{
 			Fetcher: IdentityFetcher{
 				username: username,
 				password: password,
 				client:   &httpClient,
 			},
-			LoaderStorer: IdentityLoaderStorer{},
+			LoaderStorer: FilesystemLoaderStorer{},
 		},
 	}
-
-	// Fetcher := func() (Identity, error) {
-	// 	return adapter.getIdentity(username, password)
-	// 	// if err != nil {
-	// 	// return Adapter{}, err
-	// 	// }
-	// }
-
-	// adapter.headers["Z-Auth-Token"] = identity.Token
-	// adapter.identity = identity
 
 	return adapter, nil
 }
@@ -111,54 +101,3 @@ func (c Adapter) newRequest(method, url string, body io.Reader, identity Identit
 	req.Header.Add("Z-Auth-Token", identity.Token)
 	return req, nil
 }
-
-// func (c Adapter) getIdentity(username, password string) (Identity, error) {
-// 	creds := map[string]string{
-// 		"uid":  username,
-// 		"pass": password,
-// 	}
-
-// 	payload, err := json.Marshal(creds)
-// 	if err != nil {
-// 		return Identity{}, err
-// 	}
-
-// 	req, err := c.newRequest("POST", baseUrl+"/auth/login/", bytes.NewBuffer(payload))
-// 	if err != nil {
-// 		return Identity{}, err
-// 	}
-
-// 	resp, err := c.client.Do(req)
-// 	if err != nil {
-// 		return Identity{}, err
-// 	}
-// 	defer resp.Body.Close()
-
-// 	body, err := io.ReadAll(resp.Body)
-// 	if err != nil {
-// 		return Identity{}, err
-// 	}
-
-// 	fmt.Println(string(body))
-
-// 	identity := Identity{}
-
-// 	err = json.Unmarshal(body, &identity)
-// 	if err != nil {
-// 		return Identity{}, err
-// 	}
-
-// 	// The identity ID is made of the `ident` without the leading
-// 	// and trailing characters.
-// 	// For example, with
-// 	//   `ident = G9123456R`
-// 	//   `id = 9123456`
-// 	// without the leading `G` and the trailing `R`.
-// 	//
-// 	// The ID is required to make calls to other endpoints, like grades,
-// 	// agenda, and so on.
-// 	m := regexp.MustCompile("\\D")
-// 	identity.ID = m.ReplaceAllString(identity.Ident, "")
-
-// 	return identity, nil
-// }

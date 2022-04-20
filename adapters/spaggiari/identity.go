@@ -3,10 +3,15 @@ package spaggiari
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 	"regexp"
+	"time"
 )
 
 var (
@@ -23,13 +28,22 @@ type IdentityProvider struct {
 }
 
 func (p IdentityProvider) Get() (Identity, error) {
+	fmt.Println("checking loaderstorer for identity")
 
 	identity, exists, err := p.LoaderStorer.Load()
 	if err != nil {
 		return Identity{}, err
 	}
 
-	if exists {
+	fmt.Println("exists: ", exists)
+
+	now := time.Now().Format(time.RFC3339)
+
+	fmt.Println("expire", identity.Expire)
+	fmt.Println("now", now)
+
+	if exists && now >= identity.Release && now < identity.Expire {
+		fmt.Println("reusing existing identity")
 		return identity, nil
 	}
 
@@ -51,11 +65,11 @@ type LoaderStorer interface {
 	Store(Identity) error
 }
 
-type IdentityLoaderStorer struct {
+type InMemoryLoaderStorer struct {
 	identity Identity
 }
 
-func (ls IdentityLoaderStorer) Load() (Identity, bool, error) {
+func (ls InMemoryLoaderStorer) Load() (Identity, bool, error) {
 	if ls.identity == noIdentity {
 		fmt.Println("identity is not available in the store")
 		return noIdentity, false, nil
@@ -65,9 +79,72 @@ func (ls IdentityLoaderStorer) Load() (Identity, bool, error) {
 	return ls.identity, true, nil
 }
 
-func (ls IdentityLoaderStorer) Store(identity Identity) error {
+func (ls InMemoryLoaderStorer) Store(identity Identity) error {
 	ls.identity = identity
 	return nil
+}
+
+// FilesystemLoaderStorer loads and stores an Identity using the file system as a backing storage.
+type FilesystemLoaderStorer struct{}
+
+func (ls FilesystemLoaderStorer) Load() (Identity, bool, error) {
+	path, err := ls.getSettingsDir()
+	if err != nil {
+		return noIdentity, false, err
+	}
+
+	configFilePath := filepath.Join(path, "identity.json")
+
+	if _, err := os.Stat(configFilePath); errors.Is(err, os.ErrNotExist) {
+		return noIdentity, false, nil
+	}
+
+	data, err := ioutil.ReadFile(configFilePath)
+	if err != nil {
+		return noIdentity, false, err
+	}
+
+	identity := Identity{}
+	err = json.Unmarshal(data, &identity)
+	if err != nil {
+		return noIdentity, false, err
+	}
+
+	return identity, true, nil
+}
+
+func (ls FilesystemLoaderStorer) Store(identity Identity) error {
+	path, err := ls.getSettingsDir()
+	if err != nil {
+		return err
+	}
+
+	data, err := json.MarshalIndent(identity, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filepath.Join(path, "identity.json"), data, 0700)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (ls FilesystemLoaderStorer) getSettingsDir() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	path := filepath.Join(home, ".classeviva")
+	err = os.MkdirAll(path, 0700)
+	if err != nil {
+		return "", err
+	}
+
+	return path, err
 }
 
 type Fetcher interface {
@@ -75,9 +152,9 @@ type Fetcher interface {
 }
 
 type IdentityFetcher struct {
+	client   *http.Client
 	username string
 	password string
-	client   *http.Client
 }
 
 func (f IdentityFetcher) Fetch() (Identity, error) {
