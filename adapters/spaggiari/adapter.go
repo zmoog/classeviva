@@ -11,16 +11,6 @@ const (
 	baseUrl = "https://web.spaggiari.eu/rest/v1"
 )
 
-type Identity struct {
-	Ident     string `json:"ident"`
-	ID        string
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Token     string `json:"token"`
-	Release   string `json:"release"`
-	Expire    string `json:"expire"`
-}
-
 func From(username, password string) (Adapter, error) {
 	httpClient := http.Client{}
 
