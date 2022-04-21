@@ -1,50 +1,41 @@
 package grades
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
-	"sort"
-
 	"github.com/spf13/cobra"
-	"github.com/zmoog/classeviva/adapters/spaggiari"
+	"github.com/zmoog/classeviva/commands"
+)
+
+var (
+	limit int = 3
 )
 
 func initListCommand() *cobra.Command {
-	summarizeCmd := cobra.Command{
+	listCommand := cobra.Command{
 		Use:   "list",
 		Short: "List the grades on the portal",
 		// Long:  "Summarize time entries in Toggl",
 		RunE: runListCommand,
 	}
 
-	return &summarizeCmd
+	listCommand.Flags().IntVarP(&limit, "limit", "l", limit, "Limit number of results")
+
+	return &listCommand
 }
 
 func runListCommand(cmd *cobra.Command, args []string) error {
-	usernane := os.Getenv("CLASSEVIVA_USERNAME")
-	password := os.Getenv("CLASSEVIVA_PASSWORD")
-
-	adapter, err := spaggiari.From(usernane, password)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	grades, err := adapter.List()
+	runner, err := commands.NewRunner()
 	if err != nil {
 		return err
 	}
 
-	sort.Sort(ByDate(grades))
+	command := commands.ListGradesCommand{
+		Limit: limit,
+	}
 
-	output, _ := json.MarshalIndent(grades[:3], "", "  ")
-	fmt.Println(string(output))
+	err = runner.Run(command)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
-
-type ByDate []spaggiari.Grade
-
-func (a ByDate) Len() int           { return len(a) }
-func (a ByDate) Less(i, j int) bool { return a[i].Date > a[j].Date }
-func (a ByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
