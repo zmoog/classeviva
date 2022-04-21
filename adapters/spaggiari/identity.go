@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	noIdentity = Identity{}
+	noIdentity Identity
 )
 
 type Provider interface {
