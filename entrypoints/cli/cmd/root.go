@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/zmoog/classeviva/entrypoints/cli/cmd/agenda"
 	"github.com/zmoog/classeviva/entrypoints/cli/cmd/grades"
 )
 
@@ -14,6 +15,7 @@ func Execute() {
 		Short: "Classeviva is a CLI tool to access the popular school portal https://web.spaggiari.eu/",
 	}
 
+	rootCmd.AddCommand(agenda.NewCommand())
 	rootCmd.AddCommand(grades.NewCommand())
 
 	if err := rootCmd.Execute(); err != nil {
