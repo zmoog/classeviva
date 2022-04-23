@@ -29,8 +29,7 @@ type IdentityProvider struct {
 }
 
 func (p IdentityProvider) Get() (Identity, error) {
-	log.Debug("checking loaderstorer for identity")
-
+	log.Debug("Looking for an existing identity..")
 	identity, exists, err := p.LoaderStorer.Load()
 	if err != nil {
 		return Identity{}, err
@@ -39,7 +38,6 @@ func (p IdentityProvider) Get() (Identity, error) {
 	log.Debug("exists: ", exists)
 
 	now := time.Now().Format(time.RFC3339)
-
 	log.Debug("expire", identity.Expire)
 	log.Debug("now", now)
 
@@ -86,7 +84,9 @@ func (ls *InMemoryLoaderStorer) Store(identity Identity) error {
 }
 
 // FilesystemLoaderStorer loads and stores an Identity using the file system as a backing storage.
-type FilesystemLoaderStorer struct{}
+type FilesystemLoaderStorer struct {
+	Path string
+}
 
 func (ls FilesystemLoaderStorer) Load() (Identity, bool, error) {
 	path, err := ls.getSettingsDir()
@@ -97,6 +97,7 @@ func (ls FilesystemLoaderStorer) Load() (Identity, bool, error) {
 	configFilePath := filepath.Join(path, "identity.json")
 
 	if _, err := os.Stat(configFilePath); errors.Is(err, os.ErrNotExist) {
+		log.Debugf("identity file [%s] does not exist", configFilePath)
 		return noIdentity, false, nil
 	}
 
@@ -105,6 +106,7 @@ func (ls FilesystemLoaderStorer) Load() (Identity, bool, error) {
 		return noIdentity, false, err
 	}
 
+	log.Debugf("loading identity from: [%s]", configFilePath)
 	identity := Identity{}
 	err = json.Unmarshal(data, &identity)
 	if err != nil {
@@ -134,13 +136,10 @@ func (ls FilesystemLoaderStorer) Store(identity Identity) error {
 }
 
 func (ls FilesystemLoaderStorer) getSettingsDir() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
+	path := filepath.Join(ls.Path, ".classeviva")
+	log.Debugf("settings path is: [%s]", path)
 
-	path := filepath.Join(home, ".classeviva")
-	err = os.MkdirAll(path, 0700)
+	err := os.MkdirAll(path, 0700)
 	if err != nil {
 		return "", err
 	}

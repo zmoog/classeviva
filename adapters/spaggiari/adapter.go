@@ -14,7 +14,7 @@ const (
 	baseUrl = "https://web.spaggiari.eu/rest/v1"
 )
 
-func From(username, password string) (Adapter, error) {
+func From(username, password, identityStorePath string) (Adapter, error) {
 	httpClient := http.Client{}
 
 	adapter := Adapter{
@@ -24,13 +24,15 @@ func From(username, password string) (Adapter, error) {
 			"Z-Dev-Apikey": "+zorro+",
 			"Content-Type": "application/json",
 		},
-		identityProvider: IdentityProvider{
+		IdentityProvider: IdentityProvider{
 			Fetcher: IdentityFetcher{
 				username: username,
 				password: password,
 				client:   &httpClient,
 			},
-			LoaderStorer: FilesystemLoaderStorer{},
+			LoaderStorer: FilesystemLoaderStorer{
+				Path: identityStorePath,
+			},
 		},
 	}
 
@@ -40,11 +42,11 @@ func From(username, password string) (Adapter, error) {
 type Adapter struct {
 	headers          map[string]string
 	client           *http.Client
-	identityProvider IdentityProvider
+	IdentityProvider IdentityProvider
 }
 
 func (c Adapter) List() ([]Grade, error) {
-	identity, err := c.identityProvider.Get()
+	identity, err := c.IdentityProvider.Get()
 	if err != nil {
 		return []Grade{}, err
 	}
@@ -82,7 +84,7 @@ func (c Adapter) List() ([]Grade, error) {
 }
 
 func (c Adapter) ListAgenda(since, until time.Time) ([]AgendaEntry, error) {
-	identity, err := c.identityProvider.Get()
+	identity, err := c.IdentityProvider.Get()
 	if err != nil {
 		return []AgendaEntry{}, err
 	}
