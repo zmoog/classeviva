@@ -21,19 +21,13 @@ func (c ListAgendaCommand) Execute(adapter spaggiari.Adapter) error {
 		return err
 	}
 
-	if len(entries) == 0 {
-		fmt.Println("No agenda entries for the given since/until interval")
-		return nil
-	}
-
 	sort.Sort(AgendaEntriesByDate(entries))
 
-	max := len(entries) - 1
-	if c.Limit > 0 && c.Limit < max {
-		max = c.Limit
+	if c.Limit < len(entries) {
+		entries = entries[:c.Limit]
 	}
 
-	output, _ := json.MarshalIndent(entries[:max], "", "  ")
+	output, _ := json.MarshalIndent(entries, "", "  ")
 	fmt.Println(string(output))
 
 	return nil
