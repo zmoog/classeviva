@@ -11,19 +11,21 @@ import (
 
 type ListAgendaCommand struct {
 	Limit int
+	Since time.Time
+	Until time.Time
 }
 
 func (c ListAgendaCommand) Execute(adapter spaggiari.Adapter) error {
 
-	now := time.Now()
-	since := now
-	until := now.Add(5 * 24 * time.Hour)
+	// now := time.Now()
+	// since := now
+	// until := now.Add(5 * 24 * time.Hour)
 
-	fmt.Println(&now, "---", now)
-	fmt.Println(&since, "---", since)
-	fmt.Println(&until, "---", until)
+	// fmt.Println(&now, "---", now)
+	// fmt.Println(&since, "---", since)
+	// fmt.Println(&until, "---", until)
 
-	entries, err := adapter.ListAgenda(since, until)
+	entries, err := adapter.ListAgenda(c.Since, c.Until)
 	if err != nil {
 		return err
 	}
