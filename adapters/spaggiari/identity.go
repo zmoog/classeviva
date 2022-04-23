@@ -70,7 +70,7 @@ type InMemoryLoaderStorer struct {
 	identity Identity
 }
 
-func (ls InMemoryLoaderStorer) Load() (Identity, bool, error) {
+func (ls *InMemoryLoaderStorer) Load() (Identity, bool, error) {
 	if ls.identity == noIdentity {
 		log.Debug("identity is not available in the store")
 		return noIdentity, false, nil
@@ -80,7 +80,7 @@ func (ls InMemoryLoaderStorer) Load() (Identity, bool, error) {
 	return ls.identity, true, nil
 }
 
-func (ls InMemoryLoaderStorer) Store(identity Identity) error {
+func (ls *InMemoryLoaderStorer) Store(identity Identity) error {
 	ls.identity = identity
 	return nil
 }
@@ -209,7 +209,7 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 	//
 	// The ID is required to make calls to other endpoints, like grades,
 	// agenda, and so on.
-	m := regexp.MustCompile("\\D")
+	m := regexp.MustCompile(`\D`)
 	identity.ID = m.ReplaceAllString(identity.Ident, "")
 
 	return identity, nil
