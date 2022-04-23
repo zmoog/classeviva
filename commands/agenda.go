@@ -22,10 +22,11 @@ func (c ListAgendaCommand) Execute(adapter spaggiari.Adapter) error {
 	}
 
 	if len(entries) == 0 {
+		fmt.Println("No agenda entries for the given since/until interval")
 		return nil
 	}
 
-	sort.Sort(AgendaEntryByDate(entries))
+	sort.Sort(AgendaEntriesByDate(entries))
 
 	max := len(entries) - 1
 	if c.Limit > 0 && c.Limit < max {
@@ -38,8 +39,8 @@ func (c ListAgendaCommand) Execute(adapter spaggiari.Adapter) error {
 	return nil
 }
 
-type AgendaEntryByDate []spaggiari.AgendaEntry
+type AgendaEntriesByDate []spaggiari.AgendaEntry
 
-func (a AgendaEntryByDate) Len() int           { return len(a) }
-func (a AgendaEntryByDate) Less(i, j int) bool { return a[i].DatetimeBegin < a[j].DatetimeBegin }
-func (a AgendaEntryByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a AgendaEntriesByDate) Len() int           { return len(a) }
+func (a AgendaEntriesByDate) Less(i, j int) bool { return a[i].DatetimeBegin < a[j].DatetimeBegin }
+func (a AgendaEntriesByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
