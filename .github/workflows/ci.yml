@@ -31,7 +31,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.17.9'
-      - run: go test -v -cover ./...
+      - run: make test
   build:
     name: Build binaries
     runs-on: 'ubuntu-latest'
@@ -46,4 +46,4 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.17.9'
-      - run: go build -o classeviva -v entrypoints/cli/main.go
+      - run: make build
