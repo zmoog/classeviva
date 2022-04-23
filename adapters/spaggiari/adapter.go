@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -76,6 +79,49 @@ func (c Adapter) List() ([]Grade, error) {
 	}
 
 	return envelope["grades"], nil
+}
+
+func (c Adapter) ListAgenda(since, until time.Time) ([]AgendaEntry, error) {
+	identity, err := c.identityProvider.Get()
+	if err != nil {
+		return []AgendaEntry{}, err
+	}
+
+	_since := since.Format("20060102")
+	_until := until.Format("20060102")
+
+	url := baseUrl + "/students/" + identity.ID + "/agenda/all/" + _since + "/" + _until
+	// fmt.Println(url)
+	log.Debug(url)
+
+	req, err := c.newRequest("GET", url, nil, identity)
+	if err != nil {
+		return []AgendaEntry{}, err
+	}
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return []AgendaEntry{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return []AgendaEntry{}, fmt.Errorf("failed to fetch agenda entries, status_code: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return []AgendaEntry{}, err
+	}
+
+	envelope := map[string][]AgendaEntry{}
+
+	err = json.Unmarshal(body, &envelope)
+	if err != nil {
+		return []AgendaEntry{}, err
+	}
+
+	return envelope["agenda"], nil
 }
 
 func (c Adapter) newRequest(method, url string, body io.Reader, identity Identity) (*http.Request, error) {

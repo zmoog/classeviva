@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -28,22 +29,22 @@ type IdentityProvider struct {
 }
 
 func (p IdentityProvider) Get() (Identity, error) {
-	fmt.Println("checking loaderstorer for identity")
+	log.Debug("checking loaderstorer for identity")
 
 	identity, exists, err := p.LoaderStorer.Load()
 	if err != nil {
 		return Identity{}, err
 	}
 
-	fmt.Println("exists: ", exists)
+	log.Debug("exists: ", exists)
 
 	now := time.Now().Format(time.RFC3339)
 
-	fmt.Println("expire", identity.Expire)
-	fmt.Println("now", now)
+	log.Debug("expire", identity.Expire)
+	log.Debug("now", now)
 
 	if exists && now >= identity.Release && now < identity.Expire {
-		fmt.Println("reusing existing identity")
+		log.Debug("reusing existing identity")
 		return identity, nil
 	}
 
@@ -71,11 +72,11 @@ type InMemoryLoaderStorer struct {
 
 func (ls InMemoryLoaderStorer) Load() (Identity, bool, error) {
 	if ls.identity == noIdentity {
-		fmt.Println("identity is not available in the store")
+		log.Debug("identity is not available in the store")
 		return noIdentity, false, nil
 	}
 
-	fmt.Println("returning identity from the store")
+	log.Debug("returning identity from the store")
 	return ls.identity, true, nil
 }
 
@@ -158,7 +159,7 @@ type IdentityFetcher struct {
 }
 
 func (f IdentityFetcher) Fetch() (Identity, error) {
-	fmt.Println("fetching new identity")
+	log.Debug("fetching new identity")
 
 	creds := map[string]string{
 		"uid":  f.username,
@@ -190,7 +191,7 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 		return Identity{}, err
 	}
 
-	fmt.Println(string(body))
+	log.Debug(string(body))
 
 	identity := Identity{}
 
