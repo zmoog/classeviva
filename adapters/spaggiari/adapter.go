@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -89,8 +91,8 @@ func (c Adapter) ListAgenda(since, until time.Time) ([]AgendaEntry, error) {
 	_until := until.Format("20060102")
 
 	url := baseUrl + "/students/" + identity.ID + "/agenda/all/" + _since + "/" + _until
-
-	fmt.Println(url)
+	// fmt.Println(url)
+	log.Debug(url)
 
 	req, err := c.newRequest("GET", url, nil, identity)
 	if err != nil {
