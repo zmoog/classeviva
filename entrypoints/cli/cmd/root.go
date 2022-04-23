@@ -16,7 +16,7 @@ var (
 
 func Execute() {
 	var rootCmd = cobra.Command{
-		PersistentPreRun: setupRootFlags,
+		PersistentPreRun: setupLogging,
 		Use:              "classeviva",
 		Short:            "Classeviva is a CLI tool to access the popular school portal https://web.spaggiari.eu/",
 	}
@@ -31,7 +31,7 @@ func Execute() {
 	}
 }
 
-func setupRootFlags(cmd *cobra.Command, args []string) {
+func setupLogging(cmd *cobra.Command, args []string) {
 	if debug {
 		log.SetLevel(log.DebugLevel)
 	}
