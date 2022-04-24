@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
 
 type Runner struct {
-	adapter spaggiari.Adapter
+	uow UnitOfWork
 }
 
 func (r Runner) Run(command Command) error {
-	err := command.Execute(r.adapter)
+	err := command.Execute(r.uow)
 	if err != nil {
 		return err
 	}
@@ -39,7 +40,10 @@ func NewRunner() (Runner, error) {
 	}
 
 	runner := Runner{
-		adapter: adapter,
+		uow: UnitOfWork{
+			Adapter:  adapter,
+			Feedback: feedback.Default(),
+		},
 	}
 
 	return runner, nil

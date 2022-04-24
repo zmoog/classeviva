@@ -2,9 +2,8 @@ package commands
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
@@ -13,9 +12,9 @@ type ListGradesCommand struct {
 	Limit int
 }
 
-func (c ListGradesCommand) Execute(adapter spaggiari.Adapter) error {
+func (c ListGradesCommand) Execute(uow UnitOfWork) error {
 
-	grades, err := adapter.List()
+	grades, err := uow.Adapter.List()
 	if err != nil {
 		return err
 	}
@@ -28,7 +27,7 @@ func (c ListGradesCommand) Execute(adapter spaggiari.Adapter) error {
 	}
 
 	output, _ := json.MarshalIndent(grades[:max], "", "  ")
-	log.Debug(string(output))
+	fmt.Println(string(output))
 
 	return nil
 }
