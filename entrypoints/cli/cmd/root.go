@@ -1,22 +1,21 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/entrypoints/cli/cmd/agenda"
 	"github.com/zmoog/classeviva/entrypoints/cli/cmd/grades"
 )
 
 var (
-	debug bool
+	debug    bool
+	Feedback feedback.Feedback
 )
 
 func Execute() {
 	var rootCmd = cobra.Command{
-		PersistentPreRun: setupLogging,
+		PersistentPreRun: setupFeedback,
 		Use:              "classeviva",
 		Short:            "Classeviva is a CLI tool to access the popular school portal https://web.spaggiari.eu/",
 	}
@@ -27,11 +26,12 @@ func Execute() {
 	rootCmd.AddCommand(grades.NewCommand())
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		Feedback.Error(err)
 	}
 }
 
-func setupLogging(cmd *cobra.Command, args []string) {
+func setupFeedback(cmd *cobra.Command, args []string) {
+	Feedback = *feedback.Default()
 	if debug {
 		log.SetLevel(log.DebugLevel)
 	}

@@ -2,7 +2,6 @@ package commands
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 
 	"github.com/zmoog/classeviva/adapters/spaggiari"
@@ -27,7 +26,7 @@ func (c ListGradesCommand) Execute(uow UnitOfWork) error {
 	}
 
 	output, _ := json.MarshalIndent(grades[:max], "", "  ")
-	fmt.Println(string(output))
+	uow.Feedback.Println(string(output))
 
 	return nil
 }

@@ -29,11 +29,6 @@ func initListCommand() *cobra.Command {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) error {
-	runner, err := commands.NewRunner()
-	if err != nil {
-		return err
-	}
-
 	_since, err := time.Parse("2006-01-02", since)
 	if err != nil {
 		return fmt.Errorf("invalid 'since' value: %w", err)
@@ -48,6 +43,11 @@ func runListCommand(cmd *cobra.Command, args []string) error {
 		Limit: limit,
 		Since: _since,
 		Until: _until,
+	}
+
+	runner, err := commands.NewRunner()
+	if err != nil {
+		return err
 	}
 
 	err = runner.Run(command)

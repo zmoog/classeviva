@@ -35,6 +35,5 @@ func TestListAgendaCommand(t *testing.T) {
 		assert.Equal(t, stderr.String(), "")
 
 		mockAdapter.AssertExpectations(t)
-		// mockFeedback.AssertExpectations(t)
 	})
 }
