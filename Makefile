@@ -3,6 +3,7 @@ build:
 
 mocks:
 	mockery --dir adapters/spaggiari --name LoaderStorer --name Fetcher --name Adapter
+	mockery --dir commands --name Command
 
 test:
 	go test -v -cover ./...

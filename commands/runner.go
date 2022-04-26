@@ -29,12 +29,12 @@ func NewRunner() (Runner, error) {
 		return Runner{}, errors.New("CLASSEVIVA_USERNAME or CLASSEVIVA_PASSWORD environment variables are empty")
 	}
 
-	userHomeDir, err := os.UserHomeDir()
+	identityStorePath, err := os.UserHomeDir()
 	if err != nil {
 		return Runner{}, fmt.Errorf("failed to get the user home dir: %w", err)
 	}
 
-	adapter, err := spaggiari.From(usernane, password, userHomeDir)
+	adapter, err := spaggiari.From(usernane, password, identityStorePath)
 	if err != nil {
 		return Runner{}, err
 	}
