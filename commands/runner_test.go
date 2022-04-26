@@ -26,7 +26,7 @@ func TestRuner(t *testing.T) {
 		t.Setenv("CLASSEVIVA_PASSWORD", "test")
 
 		mockCommand := &mocks.Command{}
-		mockCommand.On("Execute", mock.AnythingOfType("commands.UnitOfWork")).Return(nil)
+		mockCommand.On("ExecuteWith", mock.AnythingOfType("commands.UnitOfWork")).Return(nil)
 
 		runner, err := commands.NewRunner()
 		assert.Nil(t, err)
