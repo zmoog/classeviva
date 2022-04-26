@@ -1,9 +1,11 @@
 package commands
 
 import (
-	"encoding/json"
+	"fmt"
 	"sort"
+	"strings"
 
+	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
 
@@ -25,10 +27,7 @@ func (c ListGradesCommand) ExecuteWith(uow UnitOfWork) error {
 		max = c.Limit
 	}
 
-	output, _ := json.MarshalIndent(grades[:max], "", "  ")
-	uow.Feedback.Println(string(output))
-
-	return nil
+	return feedback.PrintResult(GradesResult{Grades: grades[:max]})
 }
 
 type ByDate []spaggiari.Grade
@@ -36,3 +35,23 @@ type ByDate []spaggiari.Grade
 func (a ByDate) Len() int           { return len(a) }
 func (a ByDate) Less(i, j int) bool { return a[i].Date > a[j].Date }
 func (a ByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+type GradesResult struct {
+	Grades []spaggiari.Grade
+}
+
+func (r GradesResult) String() string {
+	var sb strings.Builder
+	for _, grade := range r.Grades {
+		fmt.Fprintf(&sb, "%v %v %v", grade.Date, grade.Subject, grade.DisplaylValue)
+		if grade.Notes != "" {
+			fmt.Fprintf(&sb, " (%v)", grade.Notes)
+		}
+		fmt.Fprintf(&sb, "\n")
+	}
+	return sb.String()
+}
+
+func (r GradesResult) Data() interface{} {
+	return r.Grades
+}

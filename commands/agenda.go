@@ -5,6 +5,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
 
@@ -27,7 +28,7 @@ func (c ListAgendaCommand) ExecuteWith(uow UnitOfWork) error {
 	}
 
 	output, _ := json.MarshalIndent(entries, "", "  ")
-	uow.Feedback.Println(string(output))
+	feedback.Println(string(output))
 
 	return nil
 }

@@ -23,7 +23,8 @@ func TestListAgendaCommand(t *testing.T) {
 
 		stdout := bytes.Buffer{}
 		stderr := bytes.Buffer{}
-		fb := feedback.New(&stdout, &stderr)
+		fb := feedback.New(&stdout, &stderr, feedback.Text)
+		feedback.SetDefault(fb)
 
 		uow := commands.UnitOfWork{Adapter: &mockAdapter, Feedback: fb}
 

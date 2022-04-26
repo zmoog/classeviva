@@ -16,8 +16,8 @@ type Grade struct {
 	DecimalValue  float32 `json:"decimalValue"`
 	DisplaylValue string  `json:"displayValue"`
 	Color         string  `json:"color"`
-	Description   string  `json:"skillValueDesc"`
-	Notes         string  `json:"notesForFamily"`
+	Description   string  `json:"skillValueDesc,omitempty"`
+	Notes         string  `json:"notesForFamily,omitempty"`
 }
 
 type AgendaEntry struct {

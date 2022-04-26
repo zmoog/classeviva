@@ -9,29 +9,36 @@ import (
 )
 
 var (
-	debug    bool
-	Feedback feedback.Feedback
+	debug  bool
+	format string
 )
 
 func Execute() {
 	var rootCmd = cobra.Command{
-		PersistentPreRun: setupFeedback,
+		PersistentPreRun: configureFeedback,
 		Use:              "classeviva",
 		Short:            "Classeviva is a CLI tool to access the popular school portal https://web.spaggiari.eu/",
 	}
 
 	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Print debug information")
+	rootCmd.PersistentFlags().StringVarP(&format, "format", "f", "text", "Output format")
 
 	rootCmd.AddCommand(agenda.NewCommand())
 	rootCmd.AddCommand(grades.NewCommand())
 
 	if err := rootCmd.Execute(); err != nil {
-		Feedback.Error(err)
+		feedback.Error(err)
 	}
 }
 
-func setupFeedback(cmd *cobra.Command, args []string) {
-	Feedback = *feedback.Default()
+func configureFeedback(cmd *cobra.Command, args []string) {
+	switch format {
+	case "json":
+		feedback.SetFormat(feedback.JSON)
+	default:
+		feedback.SetFormat(feedback.Text)
+	}
+
 	if debug {
 		log.SetLevel(log.DebugLevel)
 	}
