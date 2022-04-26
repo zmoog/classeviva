@@ -29,7 +29,7 @@ func TestListAgendaCommand(t *testing.T) {
 
 		cmd := commands.ListAgendaCommand{}
 
-		err := cmd.Execute(uow)
+		err := cmd.ExecuteWith(uow)
 		assert.Nil(t, err)
 		assert.Equal(t, stdout.String(), "[]\n")
 		assert.Equal(t, stderr.String(), "")

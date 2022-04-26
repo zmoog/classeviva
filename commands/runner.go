@@ -14,7 +14,7 @@ type Runner struct {
 }
 
 func (r Runner) Run(command Command) error {
-	err := command.Execute(r.uow)
+	err := command.ExecuteWith(r.uow)
 	if err != nil {
 		return err
 	}

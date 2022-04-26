@@ -35,5 +35,3 @@ func TestRuner(t *testing.T) {
 		assert.Nil(t, err)
 	})
 }
-
-type FakeAdapter struct{}

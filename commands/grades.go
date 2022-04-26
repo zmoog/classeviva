@@ -11,7 +11,7 @@ type ListGradesCommand struct {
 	Limit int
 }
 
-func (c ListGradesCommand) Execute(uow UnitOfWork) error {
+func (c ListGradesCommand) ExecuteWith(uow UnitOfWork) error {
 
 	grades, err := uow.Adapter.List()
 	if err != nil {

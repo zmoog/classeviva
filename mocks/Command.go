@@ -14,8 +14,8 @@ type Command struct {
 	mock.Mock
 }
 
-// Execute provides a mock function with given fields: uow
-func (_m *Command) Execute(uow commands.UnitOfWork) error {
+// ExecuteWith provides a mock function with given fields: uow
+func (_m *Command) ExecuteWith(uow commands.UnitOfWork) error {
 	ret := _m.Called(uow)
 
 	var r0 error

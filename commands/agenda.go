@@ -14,7 +14,7 @@ type ListAgendaCommand struct {
 	Until time.Time
 }
 
-func (c ListAgendaCommand) Execute(uow UnitOfWork) error {
+func (c ListAgendaCommand) ExecuteWith(uow UnitOfWork) error {
 	entries, err := uow.Adapter.ListAgenda(c.Since, c.Until)
 	if err != nil {
 		return err

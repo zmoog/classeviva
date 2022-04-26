@@ -6,7 +6,7 @@ import (
 )
 
 type Command interface {
-	Execute(uow UnitOfWork) error
+	ExecuteWith(uow UnitOfWork) error
 }
 
 type UnitOfWork struct {
