@@ -13,8 +13,7 @@ func initListCommand() *cobra.Command {
 	listCommand := cobra.Command{
 		Use:   "list",
 		Short: "List the grades on the portal",
-		// Long:  "Summarize time entries in Toggl",
-		RunE: runListCommand,
+		RunE:  runListCommand,
 	}
 
 	listCommand.Flags().IntVarP(&limit, "limit", "l", limit, "Limit number of results")
@@ -23,13 +22,13 @@ func initListCommand() *cobra.Command {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) error {
+	command := commands.ListGradesCommand{
+		Limit: limit,
+	}
+
 	runner, err := commands.NewRunner()
 	if err != nil {
 		return err
-	}
-
-	command := commands.ListGradesCommand{
-		Limit: limit,
 	}
 
 	err = runner.Run(command)

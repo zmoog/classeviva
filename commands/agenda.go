@@ -2,7 +2,6 @@ package commands
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 	"time"
 
@@ -15,8 +14,8 @@ type ListAgendaCommand struct {
 	Until time.Time
 }
 
-func (c ListAgendaCommand) Execute(adapter spaggiari.Adapter) error {
-	entries, err := adapter.ListAgenda(c.Since, c.Until)
+func (c ListAgendaCommand) ExecuteWith(uow UnitOfWork) error {
+	entries, err := uow.Adapter.ListAgenda(c.Since, c.Until)
 	if err != nil {
 		return err
 	}
@@ -28,7 +27,7 @@ func (c ListAgendaCommand) Execute(adapter spaggiari.Adapter) error {
 	}
 
 	output, _ := json.MarshalIndent(entries, "", "  ")
-	fmt.Println(string(output))
+	uow.Feedback.Println(string(output))
 
 	return nil
 }

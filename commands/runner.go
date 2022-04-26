@@ -2,17 +2,19 @@ package commands
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
+	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
 
 type Runner struct {
-	adapter spaggiari.Adapter
+	uow UnitOfWork
 }
 
 func (r Runner) Run(command Command) error {
-	err := command.Execute(r.adapter)
+	err := command.ExecuteWith(r.uow)
 	if err != nil {
 		return err
 	}
@@ -27,13 +29,21 @@ func NewRunner() (Runner, error) {
 		return Runner{}, errors.New("CLASSEVIVA_USERNAME or CLASSEVIVA_PASSWORD environment variables are empty")
 	}
 
-	adapter, err := spaggiari.From(usernane, password)
+	identityStorePath, err := os.UserHomeDir()
+	if err != nil {
+		return Runner{}, fmt.Errorf("failed to get the user home dir: %w", err)
+	}
+
+	adapter, err := spaggiari.From(usernane, password, identityStorePath)
 	if err != nil {
 		return Runner{}, err
 	}
 
 	runner := Runner{
-		adapter: adapter,
+		uow: UnitOfWork{
+			Adapter:  adapter,
+			Feedback: feedback.Default(),
+		},
 	}
 
 	return runner, nil

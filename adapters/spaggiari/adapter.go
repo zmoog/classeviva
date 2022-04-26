@@ -14,37 +14,44 @@ const (
 	baseUrl = "https://web.spaggiari.eu/rest/v1"
 )
 
-func From(username, password string) (Adapter, error) {
+func From(username, password, identityStorePath string) (Adapter, error) {
 	httpClient := http.Client{}
 
-	adapter := Adapter{
+	adapter := spaggiariAdapter{
 		client: &httpClient,
 		headers: map[string]string{
 			"User-Agent":   "zorro/1.0",
 			"Z-Dev-Apikey": "+zorro+",
 			"Content-Type": "application/json",
 		},
-		identityProvider: IdentityProvider{
+		IdentityProvider: IdentityProvider{
 			Fetcher: IdentityFetcher{
 				username: username,
 				password: password,
 				client:   &httpClient,
 			},
-			LoaderStorer: FilesystemLoaderStorer{},
+			LoaderStorer: FilesystemLoaderStorer{
+				Path: identityStorePath,
+			},
 		},
 	}
 
 	return adapter, nil
 }
 
-type Adapter struct {
-	headers          map[string]string
-	client           *http.Client
-	identityProvider IdentityProvider
+type Adapter interface {
+	List() ([]Grade, error)
+	ListAgenda(since, until time.Time) ([]AgendaEntry, error)
 }
 
-func (c Adapter) List() ([]Grade, error) {
-	identity, err := c.identityProvider.Get()
+type spaggiariAdapter struct {
+	headers          map[string]string
+	client           *http.Client
+	IdentityProvider IdentityProvider
+}
+
+func (c spaggiariAdapter) List() ([]Grade, error) {
+	identity, err := c.IdentityProvider.Get()
 	if err != nil {
 		return []Grade{}, err
 	}
@@ -81,8 +88,8 @@ func (c Adapter) List() ([]Grade, error) {
 	return envelope["grades"], nil
 }
 
-func (c Adapter) ListAgenda(since, until time.Time) ([]AgendaEntry, error) {
-	identity, err := c.identityProvider.Get()
+func (c spaggiariAdapter) ListAgenda(since, until time.Time) ([]AgendaEntry, error) {
+	identity, err := c.IdentityProvider.Get()
 	if err != nil {
 		return []AgendaEntry{}, err
 	}
@@ -124,7 +131,7 @@ func (c Adapter) ListAgenda(since, until time.Time) ([]AgendaEntry, error) {
 	return envelope["agenda"], nil
 }
 
-func (c Adapter) newRequest(method, url string, body io.Reader, identity Identity) (*http.Request, error) {
+func (c spaggiariAdapter) newRequest(method, url string, body io.Reader, identity Identity) (*http.Request, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err
