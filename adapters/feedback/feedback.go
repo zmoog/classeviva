@@ -40,15 +40,26 @@ func (fb *Feedback) Error(v interface{}) {
 	fmt.Fprintln(fb.err, v)
 }
 
-func (fb *Feedback) PrintResult(result Result) (err error) {
+func (fb *Feedback) PrintResult(result Result) error {
+	var output string
+
 	switch fb.format {
 	case JSON:
-		output, _ := json.MarshalIndent(result.Data(), "", "  ")
-		_, err = fmt.Fprint(fb.out, string(output))
+		byteOutput, err := json.MarshalIndent(result.Data(), "", "  ")
+		if err != nil {
+			return fmt.Errorf("failed to marshall result: %w", err)
+		}
+		output = string(byteOutput)
 	default:
-		_, err = fmt.Fprint(fb.out, result.String())
+		output = result.String()
 	}
-	return err
+
+	_, err := fmt.Fprint(fb.out, output)
+	if err != nil {
+		return fmt.Errorf("failed to print result: %w", err)
+	}
+
+	return nil
 }
 
 type Result interface {
