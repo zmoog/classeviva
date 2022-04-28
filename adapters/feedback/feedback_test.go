@@ -71,9 +71,12 @@ func TestPrintResult(t *testing.T) {
 		})
 		assert.NoError(t, err)
 
-		assert.Equal(t, `2022-04-22 COMPORTAMENTO 7+ (comportamento della settimana)
-2022-04-22 SCIENZE 7
-`, stdout.String())
+		assert.Equal(t, `+------------+-------+---------------+-------------------------------+
+| DATE       | GRADE | SUBJECT       | NOTES                         |
++------------+-------+---------------+-------------------------------+
+| 2022-04-22 | 7+    | COMPORTAMENTO | comportamento della settimana |
+|            | 7     | SCIENZE       |                               |
++------------+-------+---------------+-------------------------------+`, stdout.String())
 		assert.Equal(t, "", stderr.String())
 	})
 

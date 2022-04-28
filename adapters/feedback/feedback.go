@@ -29,7 +29,6 @@ func Default() *Feedback {
 }
 
 func (fb *Feedback) SetFormat(format OutputFormat) {
-	fb.Println("Setting format")
 	fb.format = format
 }
 

@@ -1,10 +1,9 @@
 package commands
 
 import (
-	"fmt"
 	"sort"
-	"strings"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
@@ -40,18 +39,22 @@ type GradesResult struct {
 	Grades []spaggiari.Grade
 }
 
+// String returns a string representation of the grades.
 func (r GradesResult) String() string {
-	var sb strings.Builder
-	for _, grade := range r.Grades {
-		fmt.Fprintf(&sb, "%v %v %v", grade.Date, grade.Subject, grade.DisplaylValue)
-		if grade.Notes != "" {
-			fmt.Fprintf(&sb, " (%v)", grade.Notes)
-		}
-		fmt.Fprintf(&sb, "\n")
+	t := table.NewWriter()
+
+	t.SetColumnConfigs([]table.ColumnConfig{{Number: 1, AutoMerge: true}})
+	// t.Style().Options.SeparateRows = true
+	t.AppendHeader(table.Row{"Date", "Grade", "Subject", "Notes"})
+
+	for _, g := range r.Grades {
+		t.AppendRow(table.Row{g.Date, g.DisplaylValue, g.Subject, g.Notes})
 	}
-	return sb.String()
+
+	return t.Render()
 }
 
+// Data returns an interface holding with a `[]spaggiari.Grade` data structure.
 func (r GradesResult) Data() interface{} {
 	return r.Grades
 }
