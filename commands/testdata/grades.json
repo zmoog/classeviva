@@ -1,0 +1,31 @@
+[
+    {
+        "subjectId": 396136,
+        "subjectCode": "ITA",
+        "subjectDesc": "ITALIANO",
+        "evtId": 420590,
+        "evtCode": "GRV0",
+        "evtDate": "2021-11-09",
+        "decimalValue": 8,
+        "displayValue": "8",
+        "displaPos": 2,
+        "notesForFamily": "",
+        "color": "green",
+        "canceled": false,
+        "underlined": false,
+        "periodPos": 1,
+        "periodDesc": "Quadrimestre",
+        "componentPos": 1,
+        "componentDesc": "Unico",
+        "weightFactor": 1,
+        "skillId": 0,
+        "gradeMasterId": 0,
+        "skillDesc": null,
+        "skillCode": null,
+        "skillMasterId": 0,
+        "skillValueDesc": " Interrogazione Letteratura, unit\u00e0 1: la letteratura italiana in prosa e in versi del 1200.",
+        "skillValueShortDesc": null,
+        "oldskillId": 0,
+        "oldskillDesc": ""
+    }
+]

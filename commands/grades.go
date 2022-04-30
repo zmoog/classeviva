@@ -21,12 +21,11 @@ func (c ListGradesCommand) ExecuteWith(uow UnitOfWork) error {
 
 	sort.Sort(ByDate(grades))
 
-	max := len(grades) - 1
-	if c.Limit > 0 && c.Limit < max {
-		max = c.Limit
+	if c.Limit < len(grades) {
+		grades = grades[:c.Limit]
 	}
 
-	return feedback.PrintResult(GradesResult{Grades: grades[:max]})
+	return feedback.PrintResult(GradesResult{Grades: grades})
 }
 
 type ByDate []spaggiari.Grade
@@ -41,10 +40,12 @@ type GradesResult struct {
 
 // String returns a string representation of the grades.
 func (r GradesResult) String() string {
-	t := table.NewWriter()
+	if len(r.Grades) == 0 {
+		return "No grades in this interval."
+	}
 
+	t := table.NewWriter()
 	t.SetColumnConfigs([]table.ColumnConfig{{Number: 1, AutoMerge: true}})
-	// t.Style().Options.SeparateRows = true
 	t.AppendHeader(table.Row{"Date", "Grade", "Subject", "Notes"})
 
 	for _, g := range r.Grades {
