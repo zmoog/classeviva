@@ -40,6 +40,6 @@ func configureFeedback(cmd *cobra.Command, args []string) {
 	}
 
 	if debug {
-		log.SetLevel(log.DebugLevel)
+		log.SetLevel(log.TraceLevel)
 	}
 }

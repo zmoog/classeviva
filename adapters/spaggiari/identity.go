@@ -189,8 +189,7 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 	if err != nil {
 		return Identity{}, err
 	}
-
-	log.Debug(string(body))
+	log.Trace(string(body))
 
 	identity := Identity{}
 
