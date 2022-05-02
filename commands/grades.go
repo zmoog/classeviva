@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
@@ -49,7 +50,16 @@ func (r GradesResult) String() string {
 	t.AppendHeader(table.Row{"Date", "Grade", "Subject", "Notes"})
 
 	for _, g := range r.Grades {
-		t.AppendRow(table.Row{g.Date, g.DisplaylValue, g.Subject, g.Notes})
+		value := g.DisplaylValue
+		switch g.Color {
+		case "green":
+			value = text.FgGreen.Sprint(value)
+		case "red":
+			value = text.FgRed.Sprint(value)
+		case "blue":
+			value = text.FgBlue.Sprint(value)
+		}
+		t.AppendRow(table.Row{g.Date, value, g.Subject, g.Notes})
 	}
 
 	return t.Render()

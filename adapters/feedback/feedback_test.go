@@ -71,12 +71,15 @@ func TestPrintResult(t *testing.T) {
 		})
 		assert.NoError(t, err)
 
-		assert.Equal(t, `+------------+-------+---------------+-------------------------------+
-| DATE       | GRADE | SUBJECT       | NOTES                         |
-+------------+-------+---------------+-------------------------------+
-| 2022-04-22 | 7+    | COMPORTAMENTO | comportamento della settimana |
-|            | 7     | SCIENZE       |                               |
-+------------+-------+---------------+-------------------------------+`, stdout.String())
+		assert.Equal(t,
+			"+------------+-------+---------------+-------------------------------+\n"+
+				"| DATE       | GRADE | SUBJECT       | NOTES                         |\n"+
+				"+------------+-------+---------------+-------------------------------+\n"+
+				"| 2022-04-22 | \x1b[32m7+\x1b[0m    | COMPORTAMENTO | comportamento della settimana |\n"+
+				"|            | \x1b[32m7\x1b[0m     | SCIENZE       |                               |\n"+
+				"+------------+-------+---------------+-------------------------------+",
+			stdout.String(),
+		)
 		assert.Equal(t, "", stderr.String())
 	})
 
