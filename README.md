@@ -6,7 +6,7 @@ Classeviva is a Go library and CLI tool to access the popular school portal http
 
 Text output:
 
-```shell
+```text
 $ classeviva grades list --limit 3
 +------------+-------+-----------------+-------------------------------+
 | DATE       | GRADE | SUBJECT         | NOTES                         |
@@ -35,25 +35,39 @@ $ classeviva grades list --limit 1 --format json
 
 ## Agenda
 
-```shell
+Text output:
+
+```text
+$ classeviva agenda list --limit 2
++---------------------------+---------------------------+---------+----------------------+-----------------------------------------------------------------------+
+| BEGIN                     | END                       | SUBJECT | TEACHER              | NOTES                                                                 |
++---------------------------+---------------------------+---------+----------------------+-----------------------------------------------------------------------+
+| 2022-05-02T09:00:00+02:00 | 2022-05-02T10:00:00+02:00 |         | PESANDO MARGHERITA   | Inizio interrogazioni di inglese (1º turno)                           |
+| 2022-05-03T00:00:00+02:00 | 2022-05-03T23:59:59+02:00 |         | AVANZATO PAOLA CARLA | Link per colloqui                                                     |
++---------------------------+---------------------------+---------+----------------------+-----------------------------------------------------------------------+
+```
+
+JSON output:
+
+```text
 $ classeviva agenda list --until 2022-04-27 --limit 2
 [
   {
-    "evtId": 550756,
+    "evtId": 546249,
     "evtCode": "AGNT",
-    "evtDatetimeBegin": "2022-04-26T08:00:00+02:00",
-    "evtDatetimeEnd": "2022-04-26T09:00:00+02:00",
-    "notes": "PORTARE LETTERATURA",
-    "authorName": "DICEMBRE ELISA",
+    "evtDatetimeBegin": "2022-05-02T09:00:00+02:00",
+    "evtDatetimeEnd": "2022-05-02T10:00:00+02:00",
+    "notes": "Inizio interrogazioni di inglese (1º turno)",
+    "authorName": "PESANDO MARGHERITA",
     "subjectDesc": ""
   },
   {
-    "evtId": 537508,
+    "evtId": 578930,
     "evtCode": "AGNT",
-    "evtDatetimeBegin": "2022-04-26T11:00:00+02:00",
-    "evtDatetimeEnd": "2022-04-26T12:00:00+02:00",
-    "notes": "Studiare Intermezzo da Cavalleria rusticana. Interrogazione.",
-    "authorName": "GRIMALDI ALESSANDRO",
+    "evtDatetimeBegin": "2022-05-03T00:00:00+02:00",
+    "evtDatetimeEnd": "2022-05-03T23:59:59+02:00",
+    "notes": "Link per colloqui prof. AVANZATO",
+    "authorName": "AVANZATO PAOLA CARLA",
     "subjectDesc": ""
   }
 ]
