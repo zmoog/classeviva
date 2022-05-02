@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	limit int = 3
+	limit int = 10
 	since string
 	until string
 )

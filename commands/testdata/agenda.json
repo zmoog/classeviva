@@ -1,0 +1,80 @@
+[
+    {
+        "evtId": 568276,
+        "evtCode": "AGHW",
+        "evtDatetimeBegin": "2022-05-05T11:00:00+02:00",
+        "evtDatetimeEnd": "2022-05-05T12:00:00+02:00",
+        "isFullDay": false,
+        "notes": "Geometria: pagina 50 n.217-218.",
+        "authorName": "ULLA ALICE",
+        "classDesc": "2E MUSICALE",
+        "subjectId": 396141,
+        "subjectDesc": "MATEMATICA",
+        "homeworkId": null
+    },
+    {
+        "evtId": 546249,
+        "evtCode": "AGNT",
+        "evtDatetimeBegin": "2022-05-02T09:00:00+02:00",
+        "evtDatetimeEnd": "2022-05-02T10:00:00+02:00",
+        "isFullDay": false,
+        "notes": "Inizio interrogazioni di inglese (1º turno)",
+        "authorName": "PESANDO MARGHERITA",
+        "classDesc": "2E MUSICALE",
+        "subjectId": null,
+        "subjectDesc": null,
+        "homeworkId": null
+    },
+    {
+        "evtId": 567012,
+        "evtCode": "AGNT",
+        "evtDatetimeBegin": "2022-05-03T12:00:00+02:00",
+        "evtDatetimeEnd": "2022-05-03T13:00:00+02:00",
+        "isFullDay": false,
+        "notes": "studiare bene la regola di p.139 e il verbo di p. 141; ex p. 139 n.3-4; p. 141 n.10",
+        "authorName": "ROMEO ENRICA",
+        "classDesc": "2E MUSICALE",
+        "subjectId": null,
+        "subjectDesc": null,
+        "homeworkId": null
+    },
+    {
+        "evtId": 546270,
+        "evtCode": "AGNT",
+        "evtDatetimeBegin": "2022-05-04T08:00:00+02:00",
+        "evtDatetimeEnd": "2022-05-04T09:00:00+02:00",
+        "isFullDay": false,
+        "notes": "2º turno interrogazioni inglese",
+        "authorName": "PESANDO MARGHERITA",
+        "classDesc": "2E MUSICALE",
+        "subjectId": null,
+        "subjectDesc": null,
+        "homeworkId": null
+    },
+    {
+        "evtId": 565987,
+        "evtCode": "AGNT",
+        "evtDatetimeBegin": "2022-05-04T12:00:00+02:00",
+        "evtDatetimeEnd": "2022-05-04T13:00:00+02:00",
+        "isFullDay": false,
+        "notes": "Consegna Programma di Lavoro EDIL-LAB  (v. spiegazioni in Classroom)",
+        "authorName": "MEGNA VALERIA",
+        "classDesc": "2E MUSICALE",
+        "subjectId": null,
+        "subjectDesc": null,
+        "homeworkId": null
+    },
+    {
+        "evtId": 546272,
+        "evtCode": "AGNT",
+        "evtDatetimeBegin": "2022-05-09T09:00:00+02:00",
+        "evtDatetimeEnd": "2022-05-09T10:00:00+02:00",
+        "isFullDay": false,
+        "notes": "3º turno interrogazioni inglese",
+        "authorName": "PESANDO MARGHERITA",
+        "classDesc": "2E MUSICALE",
+        "subjectId": null,
+        "subjectDesc": null,
+        "homeworkId": null
+    }
+]

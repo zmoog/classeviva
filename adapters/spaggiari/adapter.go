@@ -77,6 +77,7 @@ func (c spaggiariAdapter) List() ([]Grade, error) {
 	if err != nil {
 		return []Grade{}, err
 	}
+	log.Trace(string(body))
 
 	envelope := map[string][]Grade{}
 
@@ -98,8 +99,7 @@ func (c spaggiariAdapter) ListAgenda(since, until time.Time) ([]AgendaEntry, err
 	_until := until.Format("20060102")
 
 	url := baseUrl + "/students/" + identity.ID + "/agenda/all/" + _since + "/" + _until
-	// fmt.Println(url)
-	log.Debug(url)
+	log.Trace(string(url))
 
 	req, err := c.newRequest("GET", url, nil, identity)
 	if err != nil {
@@ -120,6 +120,7 @@ func (c spaggiariAdapter) ListAgenda(since, until time.Time) ([]AgendaEntry, err
 	if err != nil {
 		return []AgendaEntry{}, err
 	}
+	log.Trace(string(body))
 
 	envelope := map[string][]AgendaEntry{}
 
