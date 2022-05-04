@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -152,17 +153,17 @@ type Fetcher interface {
 }
 
 type IdentityFetcher struct {
-	client   *http.Client
-	username string
-	password string
+	Client   HTTPClient
+	Username string
+	Password string
 }
 
 func (f IdentityFetcher) Fetch() (Identity, error) {
 	log.Debug("fetching new identity")
 
 	creds := map[string]string{
-		"uid":  f.username,
-		"pass": f.password,
+		"uid":  f.Username,
+		"pass": f.Password,
 	}
 
 	payload, err := json.Marshal(creds)
@@ -179,11 +180,20 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 	req.Header.Add("Z-Dev-Apikey", "+zorro+")
 	req.Header.Add("Content-Type", "application/json")
 
-	resp, err := f.client.Do(req)
+	resp, err := f.Client.Do(req)
 	if err != nil {
 		return Identity{}, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		switch resp.StatusCode {
+		case 403:
+			return Identity{}, fmt.Errorf("fetcher: access denied to Classeviva API (status_code: %v). Hit: https://web.spaggiari.eu is not available to call from cloud provider.", resp.StatusCode)
+		default:
+			return Identity{}, fmt.Errorf("fetcher: failed to fetch identity (status_code: %v)", resp.StatusCode)
+		}
+	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -195,7 +205,7 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 
 	err = json.Unmarshal(body, &identity)
 	if err != nil {
-		return Identity{}, err
+		return Identity{}, fmt.Errorf("fetcher: failed to unmarshal identity %w", err)
 	}
 
 	// The identity ID is made of the `ident` without the leading

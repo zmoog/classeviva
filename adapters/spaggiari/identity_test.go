@@ -1,7 +1,9 @@
 package spaggiari_test
 
 import (
+	"bytes"
 	"io/ioutil"
+	"net/http"
 	"testing"
 	"time"
 
@@ -202,5 +204,37 @@ func TestIdentityProvider(t *testing.T) {
 
 		assert.Nil(t, err)
 		assert.Equal(t, "123456", i.Ident)
+	})
+}
+
+func TestFetcher(t *testing.T) {
+	t.Run("From an unauthorized location", func(t *testing.T) {
+
+		response := `<TITLE>Access Denied</TITLE>
+</HEAD><BODY>
+<H1>Access Denied</H1>
+
+You don't have permission to access "http&#58;&#47;&#47;web&#46;spaggiari&#46;eu&#47;rest&#47;v1&#47;auth&#47;login&#47;" on this server.<P>
+Reference&#32;&#35;18&#46;a6b93554&#46;1651609703&#46;877e15
+</BODY>
+</HTML>`
+
+		// create a new reader with that JSON
+		r := ioutil.NopCloser(bytes.NewReader([]byte(response)))
+
+		fetcher := spaggiari.IdentityFetcher{
+			Client: &mocks.MockClient{
+				MockDo: func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: 403,
+						Body:       r,
+					}, nil
+				},
+			},
+		}
+
+		_, err := fetcher.Fetch()
+
+		assert.ErrorContains(t, err, "fetcher: access denied to Classeviva API (status_code: 403). Hit: https://web.spaggiari.eu is not available to call from cloud provider.")
 	})
 }
