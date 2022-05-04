@@ -233,9 +233,8 @@ Reference&#32;&#35;18&#46;a6b93554&#46;1651609703&#46;877e15
 			},
 		}
 
-		identity, err := fetcher.Fetch()
+		_, err := fetcher.Fetch()
 
-		assert.Nil(t, identity)
-		assert.ErrorContains(t, err, "whatever")
+		assert.ErrorContains(t, err, "fetcher: unauthorized access to classeviva api (status_code: 401)")
 	})
 }

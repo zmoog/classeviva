@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -185,6 +186,15 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		switch resp.StatusCode {
+		case 401:
+			return Identity{}, fmt.Errorf("fetcher: unauthorized access to classeviva api (status_code: %v)", resp.StatusCode)
+		default:
+			return Identity{}, fmt.Errorf("fetcher: failed to fetch identity (status_code: %v", resp.StatusCode)
+		}
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Identity{}, err
@@ -195,7 +205,7 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 
 	err = json.Unmarshal(body, &identity)
 	if err != nil {
-		return Identity{}, err
+		return Identity{}, fmt.Errorf("fetcher: failed to unmarshal identity %w", err)
 	}
 
 	// The identity ID is made of the `ident` without the leading
