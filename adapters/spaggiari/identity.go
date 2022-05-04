@@ -152,17 +152,17 @@ type Fetcher interface {
 }
 
 type IdentityFetcher struct {
-	client   *http.Client
-	username string
-	password string
+	Client   HTTPClient
+	Username string
+	Password string
 }
 
 func (f IdentityFetcher) Fetch() (Identity, error) {
 	log.Debug("fetching new identity")
 
 	creds := map[string]string{
-		"uid":  f.username,
-		"pass": f.password,
+		"uid":  f.Username,
+		"pass": f.Password,
 	}
 
 	payload, err := json.Marshal(creds)
@@ -179,7 +179,7 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 	req.Header.Add("Z-Dev-Apikey", "+zorro+")
 	req.Header.Add("Content-Type", "application/json")
 
-	resp, err := f.client.Do(req)
+	resp, err := f.Client.Do(req)
 	if err != nil {
 		return Identity{}, err
 	}

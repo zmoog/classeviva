@@ -26,9 +26,9 @@ func From(username, password, identityStorePath string) (Adapter, error) {
 		},
 		IdentityProvider: IdentityProvider{
 			Fetcher: IdentityFetcher{
-				username: username,
-				password: password,
-				client:   &httpClient,
+				Username: username,
+				Password: password,
+				Client:   &httpClient,
 			},
 			LoaderStorer: FilesystemLoaderStorer{
 				Path: identityStorePath,
