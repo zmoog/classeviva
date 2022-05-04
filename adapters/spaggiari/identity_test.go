@@ -226,7 +226,7 @@ Reference&#32;&#35;18&#46;a6b93554&#46;1651609703&#46;877e15
 			Client: &mocks.MockClient{
 				MockDo: func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
-						StatusCode: 401,
+						StatusCode: 403,
 						Body:       r,
 					}, nil
 				},
@@ -235,6 +235,6 @@ Reference&#32;&#35;18&#46;a6b93554&#46;1651609703&#46;877e15
 
 		_, err := fetcher.Fetch()
 
-		assert.ErrorContains(t, err, "fetcher: unauthorized access to classeviva api (status_code: 401)")
+		assert.ErrorContains(t, err, "fetcher: access denied to Classeviva API (status_code: 403). Hit: https://web.spaggiari.eu is not available to call from cloud provider.")
 	})
 }
