@@ -7,13 +7,44 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - env:
+  - binary: classeviva  
+    id: classeviva
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
       # - windows
-      - darwin
+      # - darwin
     main: ./entrypoints/cli
+  
+  - binary: classeviva
+    id: classeviva-macos-amd64
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+    goarch:
+      - amd64
+    main: ./entrypoints/cli
+    hooks:
+      post:
+        - cmd: gon gon.config.amd64.hcl
+          output: true
+  
+  - binary: classeviva
+    id: classeviva-macos-arm64
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+    goarch:
+      - arm64
+    main: ./entrypoints/cli
+    hooks:
+      post:
+        - cmd: gon gon.config.arm64.hcl
+          output: true
+  
 archives:
   - replacements:
       darwin: Darwin
