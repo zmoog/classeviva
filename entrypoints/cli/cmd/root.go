@@ -6,6 +6,7 @@ import (
 	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/entrypoints/cli/cmd/agenda"
 	"github.com/zmoog/classeviva/entrypoints/cli/cmd/grades"
+	"github.com/zmoog/classeviva/entrypoints/cli/cmd/version"
 )
 
 var (
@@ -25,6 +26,7 @@ func Execute() {
 
 	rootCmd.AddCommand(agenda.NewCommand())
 	rootCmd.AddCommand(grades.NewCommand())
+	rootCmd.AddCommand(version.NewCommand())
 
 	if err := rootCmd.Execute(); err != nil {
 		feedback.Error(err)
