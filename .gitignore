@@ -17,4 +17,8 @@
 # Binaries
 classeviva
 
+# goreleaser
 dist/
+
+# gon
+unused.*.zip
