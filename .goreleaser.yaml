@@ -9,6 +9,8 @@ before:
 builds:
   - binary: classeviva  
     id: classeviva
+    ldflags:
+      - -s -w -X github.com/zmoog/classeviva/commands.version={{.Version}} -X github.com/zmoog/classeviva/commands.commit={{.Commit}} -X github.com/zmoog/classeviva/commands.date={{.Date}} -X github.com/zmoog/classeviva/commands.builtBy=goreleaser
     env:
       - CGO_ENABLED=0
     goos:
@@ -19,6 +21,8 @@ builds:
   
   - binary: classeviva
     id: classeviva-macos-amd64
+    ldflags:
+      - -s -w -X github.com/zmoog/classeviva/commands.version={{.Version}} -X github.com/zmoog/classeviva/commands.commit={{.Commit}} -X github.com/zmoog/classeviva/commands.date={{.Date}} -X github.com/zmoog/classeviva/commands.builtBy=goreleaser
     env:
       - CGO_ENABLED=0
     goos:
@@ -33,6 +37,8 @@ builds:
   
   - binary: classeviva
     id: classeviva-macos-arm64
+    ldflags:
+      - -s -w -X github.com/zmoog/classeviva/commands.version={{.Version}} -X github.com/zmoog/classeviva/commands.commit={{.Commit}} -X github.com/zmoog/classeviva/commands.date={{.Date}} -X github.com/zmoog/classeviva/commands.builtBy=goreleaser
     env:
       - CGO_ENABLED=0
     goos:
