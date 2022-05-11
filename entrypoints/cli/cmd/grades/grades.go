@@ -9,6 +9,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(initListCommand())
+	cmd.AddCommand(initSummarizeCommand())
 
 	return &cmd
 }
