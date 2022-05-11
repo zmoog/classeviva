@@ -75,28 +75,24 @@ func (c SummarizeGradesCommand) ExecuteWith(uow UnitOfWork) error {
 
 	sort.Sort(ByDateAsc(grades))
 
-	summary := map[string][]spaggiari.Grade{}
+	return feedback.PrintResult(
+		GradeSummaryResult{Summary: c.summarize(grades)},
+	)
+}
 
+func (c SummarizeGradesCommand) summarize(grades []spaggiari.Grade) []Summary {
+	gradeBySubject := map[string][]spaggiari.Grade{}
+
+	// group grades by subject
 	for _, grade := range grades {
-		if _, exists := summary[grade.Subject]; !exists {
-			summary[grade.Subject] = []spaggiari.Grade{}
+		if _, exists := gradeBySubject[grade.Subject]; !exists {
+			gradeBySubject[grade.Subject] = []spaggiari.Grade{}
 		}
-		summary[grade.Subject] = append(summary[grade.Subject], grade)
+		gradeBySubject[grade.Subject] = append(gradeBySubject[grade.Subject], grade)
 	}
 
-	return feedback.PrintResult(GradeSummaryResult{Summary: summary})
-}
-
-type GradeSummaryResult struct {
-	Summary map[string][]spaggiari.Grade
-}
-
-func (r GradeSummaryResult) String() string {
-	t := table.NewWriter()
-	t.SetColumnConfigs([]table.ColumnConfig{{Number: 1, AutoMerge: true}})
-	t.AppendHeader(table.Row{"Subject", "Grades", "Avg", "Trend"})
-
-	for subject, grades := range r.Summary {
+	summaries := []Summary{}
+	for subject, grades := range gradeBySubject {
 		gradesDisplay := []string{}
 		sum := 0.0
 		average := 0.0
@@ -116,30 +112,61 @@ func (r GradeSummaryResult) String() string {
 
 			switch {
 			case newAverage > average:
-				trend = text.FgGreen.Sprint("+")
-				// trend = "+"
+				trend = "+"
 			case newAverage < average:
-				trend = text.FgRed.Sprint("-")
-				// trend = "-"
+				trend = "-"
 			default:
 				trend = "="
 			}
 
-			// fmt.Println(sum, average, newAverage)
 			average = newAverage
 		}
 
+		summaries = append(summaries, Summary{
+			Subject: subject,
+			Grades:  gradesDisplay,
+			Average: average,
+			Trend:   trend,
+		})
+
+	}
+
+	return summaries
+}
+
+type Summary struct {
+	Subject string   `json:"subject"`
+	Grades  []string `json:"grades"`
+	Average float64  `json:"average"`
+	Trend   string
+}
+
+type GradeSummaryResult struct {
+	Summary []Summary
+}
+
+func (r GradeSummaryResult) String() string {
+	t := table.NewWriter()
+	t.SetColumnConfigs([]table.ColumnConfig{{Number: 1, AutoMerge: true}})
+	t.AppendHeader(table.Row{"Subject", "Grades", "Avg", "Trend"})
+
+	for _, s := range r.Summary {
+		value := s.Trend
+		switch value {
+		case "+":
+			value = text.FgGreen.Sprint(value)
+		case "-":
+			value = text.FgRed.Sprint(value)
+		}
 		t.AppendRow(table.Row{
-			subject,
-			strings.Join(gradesDisplay, ", "),
-			fmt.Sprintf("%.2f", average),
-			// average,
-			trend,
+			s.Subject,
+			strings.Join(s.Grades, ", "),
+			fmt.Sprintf("%.2f", s.Average),
+			value,
 		})
 	}
 
 	t.SortBy([]table.SortBy{{Name: "Avg", Mode: table.DscNumeric}})
-	// t.SetColumnConfigs([]table.ColumnConfig{{}})
 
 	return t.Render()
 }
