@@ -176,8 +176,8 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 		return Identity{}, err
 	}
 
-	req.Header.Add("User-Agent", "zorro/1.0")
-	req.Header.Add("Z-Dev-Apikey", "+zorro+")
+	req.Header.Add("User-Agent", "CVVS/std/4.2.3 Android/12")
+	req.Header.Add("Z-Dev-Apikey", "Tg1NWEwNGIgIC0K")
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := f.Client.Do(req)

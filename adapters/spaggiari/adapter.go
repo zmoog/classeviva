@@ -10,18 +10,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	baseUrl = "https://web.spaggiari.eu/rest/v1"
-)
-
 func From(username, password, identityStorePath string) (Adapter, error) {
 	httpClient := http.Client{}
 
 	adapter := spaggiariAdapter{
 		client: &httpClient,
 		headers: map[string]string{
-			"User-Agent":   "zorro/1.0",
-			"Z-Dev-Apikey": "+zorro+",
+			"User-Agent":   userAgent,
+			"Z-Dev-Apikey": apiKey,
 			"Content-Type": "application/json",
 		},
 		IdentityProvider: IdentityProvider{
