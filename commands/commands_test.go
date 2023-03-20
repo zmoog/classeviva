@@ -3,7 +3,6 @@ package commands_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 )
 
@@ -19,7 +18,7 @@ func UnmarshalFrom(path string, v interface{}) error {
 		return fmt.Errorf("can't read from %v", path)
 	}
 
-	content, err := ioutil.ReadFile(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("can't read test data from %v: %w", path, err)
 	}

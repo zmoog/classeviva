@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -102,7 +101,7 @@ func (ls FilesystemLoaderStorer) Load() (Identity, bool, error) {
 		return noIdentity, false, nil
 	}
 
-	data, err := ioutil.ReadFile(configFilePath)
+	data, err := os.ReadFile(configFilePath)
 	if err != nil {
 		return noIdentity, false, err
 	}
@@ -128,7 +127,7 @@ func (ls FilesystemLoaderStorer) Store(identity Identity) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(path, "identity.json"), data, 0700)
+	err = os.WriteFile(filepath.Join(path, "identity.json"), data, 0700)
 	if err != nil {
 		return err
 	}

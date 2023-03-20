@@ -2,8 +2,9 @@ package spaggiari_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -52,7 +53,7 @@ func TestInMemoryLoaderStorer(t *testing.T) {
 
 func TestFilesystemLoaderStorer(t *testing.T) {
 	t.Run("Load from empty an store", func(t *testing.T) {
-		path, err := ioutil.TempDir("", "")
+		path, err := os.MkdirTemp("", "")
 		if err != nil {
 			t.Error(err)
 		}
@@ -72,7 +73,7 @@ func TestFilesystemLoaderStorer(t *testing.T) {
 	})
 
 	t.Run("Store and load the identity", func(t *testing.T) {
-		path, err := ioutil.TempDir("", "")
+		path, err := os.MkdirTemp("", "")
 		if err != nil {
 			t.Error(err)
 		}
@@ -220,7 +221,7 @@ Reference&#32;&#35;18&#46;a6b93554&#46;1651609703&#46;877e15
 </HTML>`
 
 		// create a new reader with that JSON
-		r := ioutil.NopCloser(bytes.NewReader([]byte(response)))
+		r := io.NopCloser(bytes.NewReader([]byte(response)))
 
 		fetcher := spaggiari.IdentityFetcher{
 			Client: &mocks.MockClient{

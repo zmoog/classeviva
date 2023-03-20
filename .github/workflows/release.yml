@@ -25,7 +25,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: 1.20.2
       - name: Install gon for code signing and notarization
         run: |
           wget -q https://github.com/mitchellh/gon/releases/download/v0.2.5/gon_macos.zip -O /tmp/gon_macos.zip

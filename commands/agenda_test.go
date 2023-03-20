@@ -2,7 +2,7 @@ package commands_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -63,7 +63,7 @@ func TestListAgendaCommand(t *testing.T) {
 		err := cmd.ExecuteWith(uow)
 		assert.Nil(t, err)
 
-		expected, err := ioutil.ReadFile("testdata/agenda.out.txt")
+		expected, err := os.ReadFile("testdata/agenda.out.txt")
 		if err != nil {
 			t.Errorf("can't read test data from %v: %v", "testdata/agenda.out.txt", err)
 		}
