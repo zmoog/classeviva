@@ -89,7 +89,7 @@ func TestSummarize(t *testing.T) {
 		err := cmd.ExecuteWith(uow)
 		assert.Nil(t, err)
 
-		expected, err := ioutil.ReadFile("testdata/grades-summarize.out.txt")
+		expected, err := os.ReadFile("testdata/grades-summarize.out.txt")
 		if err != nil {
 			t.Errorf("can't read test data from %v: %v", "testdata/grades-summarize.out.txtt", err)
 		}
