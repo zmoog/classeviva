@@ -36,7 +36,7 @@ func TestListGradesCommand(t *testing.T) {
 		mockAdapter.AssertExpectations(t)
 	})
 
-	t.Run("List 5 agenda entries", func(t *testing.T) {
+	t.Run("List 1 grade", func(t *testing.T) {
 		entries := []spaggiari.Grade{}
 		if err := UnmarshalFrom("testdata/grades.json", &entries); err != nil {
 			t.Error(err)
@@ -65,5 +65,39 @@ func TestListGradesCommand(t *testing.T) {
 		assert.Equal(t, stderr.String(), "")
 
 		mockAdapter.AssertExpectations(t)
+	})
+}
+
+func TestSummarize(t *testing.T) {
+	t.Run("Summarize grades", func(t *testing.T) {
+		entries := []spaggiari.Grade{}
+		if err := UnmarshalFrom("testdata/grades-summarize.json", &entries); err != nil {
+			t.Error(err)
+		}
+
+		mockAdapter := mocks.Adapter{}
+		mockAdapter.On("List").Return(entries, nil)
+
+		stdout := bytes.Buffer{}
+		stderr := bytes.Buffer{}
+		fb := feedback.New(&stdout, &stderr, feedback.Text)
+		feedback.SetDefault(fb)
+
+		uow := commands.UnitOfWork{Adapter: &mockAdapter, Feedback: fb}
+		cmd := commands.SummarizeGradesCommand{}
+
+		err := cmd.ExecuteWith(uow)
+		assert.Nil(t, err)
+
+		expected, err := os.ReadFile("testdata/grades-summarize.out.txt")
+		if err != nil {
+			t.Errorf("can't read test data from %v: %v", "testdata/grades-summarize.out.txtt", err)
+		}
+
+		assert.Equal(t, string(expected), stdout.String())
+		assert.Equal(t, "", stderr.String())
+
+		// should I test for this method to be called?
+		// mockAdapter.AssertExpectations(t)
 	})
 }
