@@ -26,18 +26,29 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.20.2
-      - name: Install gon for code signing and notarization
-        run: |
-          wget -q https://github.com/mitchellh/gon/releases/download/v0.2.5/gon_macos.zip -O /tmp/gon_macos.zip
-          unzip /tmp/gon_macos.zip -d /usr/local/bin          
-      - name: Set up keychain for macOS code-signing and notarization
-        env:
-          KEYCHAIN_PATH: "/tmp/apple-developer.keychain-db"
-        run: |
-          echo "${{ secrets.KEYCHAIN_CONTENT }}" | base64 --decode > ${{ env.KEYCHAIN_PATH }}
-          security default-keychain -s ${{ env.KEYCHAIN_PATH }}
-          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN_PATH }}"
-          git status
+      #
+      # Uncomment the following lines if you want to use macOS notarization
+      # ---------------------------------------------------------------
+      #
+      # I have commented out the following lines because I don't have a
+      # paid Apple Developer account anymore.
+      # 
+      # Since I'm probably the only one who will ever use this, I'm not
+      # goint to spend $99/year until I have a good reason to do so.
+      #
+      # - name: Install gon for code signing and notarization
+      #   run: |
+      #     wget -q https://github.com/mitchellh/gon/releases/download/v0.2.5/gon_macos.zip -O /tmp/gon_macos.zip
+      #     unzip /tmp/gon_macos.zip -d /usr/local/bin          
+      # - name: Set up keychain for macOS code-signing and notarization
+      #   env:
+      #     KEYCHAIN_PATH: "/tmp/apple-developer.keychain-db"
+      #   run: |
+      #     echo "${{ secrets.KEYCHAIN_CONTENT }}" | base64 --decode > ${{ env.KEYCHAIN_PATH }}
+      #     security default-keychain -s ${{ env.KEYCHAIN_PATH }}
+      #     security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN_PATH }}"
+      #     git status
+      
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
