@@ -16,40 +16,51 @@ builds:
     goos:
       - linux
       # - windows
-      # - darwin
+      - darwin
     main: ./entrypoints/cli
   
-  - binary: classeviva
-    id: classeviva-macos-amd64
-    ldflags:
-      - -s -w -X github.com/zmoog/classeviva/commands.version={{.Version}} -X github.com/zmoog/classeviva/commands.commit={{.Commit}} -X github.com/zmoog/classeviva/commands.date={{.Date}} -X github.com/zmoog/classeviva/commands.builtBy=goreleaser
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - darwin
-    goarch:
-      - amd64
-    main: ./entrypoints/cli
-    hooks:
-      post:
-        - cmd: gon gon.config.amd64.hcl
-          output: true
+  #
+  # Uncomment the following lines if you want to use macOS notarization
+  # ---------------------------------------------------------------
+  #
+  # I have commented out the following lines because I don't have a
+  # paid Apple Developer account anymore.
+  # 
+  # Since I'm probably the only one who will ever use this, I'm not
+  # goint to spend $99/year until I have a good reason to do so.
+  #
+    
+  # - binary: classeviva
+  #   id: classeviva-macos-amd64
+  #   ldflags:
+  #     - -s -w -X github.com/zmoog/classeviva/commands.version={{.Version}} -X github.com/zmoog/classeviva/commands.commit={{.Commit}} -X github.com/zmoog/classeviva/commands.date={{.Date}} -X github.com/zmoog/classeviva/commands.builtBy=goreleaser
+  #   env:
+  #     - CGO_ENABLED=0
+  #   goos:
+  #     - darwin
+  #   goarch:
+  #     - amd64
+  #   main: ./entrypoints/cli
+  #   hooks:
+  #     post:
+  #       - cmd: gon gon.config.amd64.hcl
+  #         output: true
   
-  - binary: classeviva
-    id: classeviva-macos-arm64
-    ldflags:
-      - -s -w -X github.com/zmoog/classeviva/commands.version={{.Version}} -X github.com/zmoog/classeviva/commands.commit={{.Commit}} -X github.com/zmoog/classeviva/commands.date={{.Date}} -X github.com/zmoog/classeviva/commands.builtBy=goreleaser
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - darwin
-    goarch:
-      - arm64
-    main: ./entrypoints/cli
-    hooks:
-      post:
-        - cmd: gon gon.config.arm64.hcl
-          output: true
+  # - binary: classeviva
+  #   id: classeviva-macos-arm64
+  #   ldflags:
+  #     - -s -w -X github.com/zmoog/classeviva/commands.version={{.Version}} -X github.com/zmoog/classeviva/commands.commit={{.Commit}} -X github.com/zmoog/classeviva/commands.date={{.Date}} -X github.com/zmoog/classeviva/commands.builtBy=goreleaser
+  #   env:
+  #     - CGO_ENABLED=0
+  #   goos:
+  #     - darwin
+  #   goarch:
+  #     - arm64
+  #   main: ./entrypoints/cli
+  #   hooks:
+  #     post:
+  #       - cmd: gon gon.config.arm64.hcl
+  #         output: true
   
 archives:
   - replacements:
