@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
 
@@ -13,7 +14,7 @@ func (c ListNoticeboardsCommand) ExecuteWith(uow UnitOfWork) error {
 		return err
 	}
 
-	return uow.Feedback.PrintResult(NoticeboardsResult{Items: items})
+	return feedback.PrintResult(NoticeboardsResult{Items: items})
 }
 
 type NoticeboardsResult struct {

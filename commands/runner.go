@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
 
@@ -41,8 +40,8 @@ func NewRunner() (Runner, error) {
 
 	runner := Runner{
 		uow: UnitOfWork{
-			Adapter:  adapter,
-			Feedback: feedback.Default(),
+			Adapter: adapter,
+			// Feedback: feedback.Default(),
 		},
 	}
 
