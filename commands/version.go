@@ -32,7 +32,7 @@ type VersionResult struct {
 }
 
 func (r VersionResult) String() string {
-	return fmt.Sprintf("Classeviva CLI %v (%v) %v by %v", version, commit, date, builtBy)
+	return fmt.Sprintf("Classeviva CLI %v (%v) %v by %v\n", version, commit, date, builtBy)
 }
 
 func (r VersionResult) Data() interface{} {

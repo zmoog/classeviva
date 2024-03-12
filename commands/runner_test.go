@@ -5,10 +5,14 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/zmoog/classeviva/commands"
-	"github.com/zmoog/classeviva/mocks"
 )
+
+type TestCommand struct{}
+
+func (c TestCommand) ExecuteWith(uow commands.UnitOfWork) error {
+	return nil
+}
 
 func TestRuner(t *testing.T) {
 
@@ -25,13 +29,13 @@ func TestRuner(t *testing.T) {
 		t.Setenv("CLASSEVIVA_USERNAME", "test")
 		t.Setenv("CLASSEVIVA_PASSWORD", "test")
 
-		mockCommand := &mocks.Command{}
-		mockCommand.On("ExecuteWith", mock.AnythingOfType("commands.UnitOfWork")).Return(nil)
+		testCommand := TestCommand{}
+		// mockCommand.On("ExecuteWith", mock.AnythingOfType("commands.UnitOfWork")).Return(nil)
 
 		runner, err := commands.NewRunner()
 		assert.Nil(t, err)
 
-		err = runner.Run(mockCommand)
+		err = runner.Run(testCommand)
 		assert.Nil(t, err)
 	})
 }
