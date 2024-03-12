@@ -27,8 +27,8 @@ func TestListGradesCommand(t *testing.T) {
 		feedback.SetDefault(fb)
 
 		uow := commands.UnitOfWork{
-			Adapter:  adapter,
-			Feedback: fb,
+			Adapter: adapter,
+			// Feedback: fb,
 		}
 
 		cmd := commands.ListGradesCommand{Limit: 100}
@@ -59,7 +59,10 @@ func TestListGradesCommand(t *testing.T) {
 		fb := feedback.New(&stdout, &stderr, feedback.Text)
 		feedback.SetDefault(fb)
 
-		uow := commands.UnitOfWork{Adapter: adapter, Feedback: fb}
+		uow := commands.UnitOfWork{
+			Adapter: adapter,
+			// Feedback: fb,
+		}
 		cmd := commands.ListGradesCommand{Limit: 10}
 
 		err := cmd.ExecuteWith(uow)

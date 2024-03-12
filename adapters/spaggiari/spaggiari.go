@@ -54,7 +54,6 @@ type Adapter struct {
 	Noticeboards NoticeboardsReceiver
 }
 
-//go:generate mockery --name Client
 type Client interface {
 	Get(url string, unmarshal Unmarshal) error
 }

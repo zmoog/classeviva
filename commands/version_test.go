@@ -19,14 +19,14 @@ func TestVersion(t *testing.T) {
 		fb := feedback.New(&stdout, &stderr, feedback.Text)
 		feedback.SetDefault(fb)
 
-		uow := commands.UnitOfWork{Adapter: adapter, Feedback: fb}
+		uow := commands.UnitOfWork{Adapter: adapter}
 
 		cmd := commands.VersionCommand{}
 
 		err := cmd.ExecuteWith(uow)
 		assert.Nil(t, err)
 
-		assert.Equal(t, "Classeviva CLI v0.0.0 (123) 2022-05-08 by zmoog", stdout.String())
+		assert.Equal(t, "Classeviva CLI v0.0.0 (123) 2022-05-08 by zmoog\n", stdout.String())
 		assert.Equal(t, "", stderr.String())
 	})
 
@@ -38,7 +38,7 @@ func TestVersion(t *testing.T) {
 		fb := feedback.New(&stdout, &stderr, feedback.JSON)
 		feedback.SetDefault(fb)
 
-		uow := commands.UnitOfWork{Adapter: adapter, Feedback: fb}
+		uow := commands.UnitOfWork{Adapter: adapter}
 
 		cmd := commands.VersionCommand{}
 

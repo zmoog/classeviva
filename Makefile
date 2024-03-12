@@ -2,6 +2,7 @@ build:
 	go build -o classeviva -v entrypoints/cli/main.go
 
 mock:
+	mockery --dir adapters/spaggiari --name AgendaReceiver
 	mockery --dir adapters/spaggiari --name Client
 	mockery --dir adapters/spaggiari --name Fetcher
 	mockery --dir adapters/spaggiari --name GradesReceiver
