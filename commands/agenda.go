@@ -1,9 +1,11 @@
 package commands
 
 import (
+	"sort"
 	"time"
 
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
 
@@ -14,19 +16,18 @@ type ListAgendaCommand struct {
 }
 
 func (c ListAgendaCommand) ExecuteWith(uow UnitOfWork) error {
-	// entries, err := uow.Adapter.ListAgenda(c.Since, c.Until)
-	// if err != nil {
-	// 	return err
-	// }
+	entries, err := uow.Adapter.Agenda.List(c.Since, c.Until)
+	if err != nil {
+		return err
+	}
 
-	// sort.Sort(AgendaEntriesByDate(entries))
+	sort.Sort(AgendaEntriesByDate(entries))
 
-	// if c.Limit < len(entries) {
-	// 	entries = entries[:c.Limit]
-	// }
+	if c.Limit < len(entries) {
+		entries = entries[:c.Limit]
+	}
 
-	// return feedback.PrintResult(AgendaEntriesResult{Entries: entries})
-	return nil
+	return feedback.PrintResult(AgendaEntriesResult{Entries: entries})
 }
 
 type AgendaEntriesByDate []spaggiari.AgendaEntry

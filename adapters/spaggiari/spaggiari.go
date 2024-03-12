@@ -31,6 +31,10 @@ func New(username, password, identityStorePath string) (Adapter, error) {
 	spaggiariClient := NewSpaggiariClient(identityProvider)
 
 	adapter := Adapter{
+		Agenda: agendaReceiver{
+			Client:           spaggiariClient,
+			IdentityProvider: identityProvider,
+		},
 		Grades: gradeReceiver{
 			Client:           spaggiariClient,
 			IdentityProvider: identityProvider,
@@ -45,6 +49,7 @@ func New(username, password, identityStorePath string) (Adapter, error) {
 }
 
 type Adapter struct {
+	Agenda       AgendaReceiver
 	Grades       GradesReceiver
 	Noticeboards NoticeboardsReceiver
 }
