@@ -14,17 +14,22 @@ import (
 
 func TestListGradesCommand(t *testing.T) {
 	t.Run("Empty grades list", func(t *testing.T) {
-		mockAdapter := mocks.Adapter{}
-		mockAdapter.On(
+		gradesReceiver := mocks.NewGradesReceiver(t)
+		gradesReceiver.On(
 			"List",
 		).Return([]spaggiari.Grade{}, nil)
+
+		adapter := spaggiari.Adapter{Grades: gradesReceiver}
 
 		stdout := bytes.Buffer{}
 		stderr := bytes.Buffer{}
 		fb := feedback.New(&stdout, &stderr, feedback.Text)
 		feedback.SetDefault(fb)
 
-		uow := commands.UnitOfWork{Adapter: &mockAdapter, Feedback: fb}
+		uow := commands.UnitOfWork{
+			Adapter:  adapter,
+			Feedback: fb,
+		}
 
 		cmd := commands.ListGradesCommand{Limit: 100}
 
@@ -33,7 +38,7 @@ func TestListGradesCommand(t *testing.T) {
 		assert.Equal(t, stdout.String(), "No grades in this interval.")
 		assert.Equal(t, stderr.String(), "")
 
-		mockAdapter.AssertExpectations(t)
+		// mockAdapter.AssertExpectations(t)
 	})
 
 	t.Run("List 5 agenda entries", func(t *testing.T) {
@@ -42,15 +47,19 @@ func TestListGradesCommand(t *testing.T) {
 			t.Error(err)
 		}
 
-		mockAdapter := mocks.Adapter{}
-		mockAdapter.On("List").Return(entries, nil)
+		gradesReceiver := mocks.NewGradesReceiver(t)
+		gradesReceiver.On(
+			"List",
+		).Return(entries, nil)
+
+		adapter := spaggiari.Adapter{Grades: gradesReceiver}
 
 		stdout := bytes.Buffer{}
 		stderr := bytes.Buffer{}
 		fb := feedback.New(&stdout, &stderr, feedback.Text)
 		feedback.SetDefault(fb)
 
-		uow := commands.UnitOfWork{Adapter: &mockAdapter, Feedback: fb}
+		uow := commands.UnitOfWork{Adapter: adapter, Feedback: fb}
 		cmd := commands.ListGradesCommand{Limit: 10}
 
 		err := cmd.ExecuteWith(uow)
@@ -64,6 +73,6 @@ func TestListGradesCommand(t *testing.T) {
 		assert.Equal(t, stdout.String(), string(expected))
 		assert.Equal(t, stderr.String(), "")
 
-		mockAdapter.AssertExpectations(t)
+		// mockAdapter.AssertExpectations(t)
 	})
 }

@@ -32,3 +32,11 @@ type AgendaEntry struct {
 	// "subjectId": 396137,
 	// "homeworkId": null
 }
+
+type Noticeboard struct {
+	ID              int    `json:"pubId"`
+	Title           string `json:"cntTitle"`
+	Read            bool   `json:"readStatus"`
+	PublicationDate string `json:"pubDT"`
+	EventCode       string `json:"evtCode"`
+}

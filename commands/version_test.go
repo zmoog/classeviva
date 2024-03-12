@@ -6,20 +6,20 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zmoog/classeviva/adapters/feedback"
+	"github.com/zmoog/classeviva/adapters/spaggiari"
 	"github.com/zmoog/classeviva/commands"
-	"github.com/zmoog/classeviva/mocks"
 )
 
 func TestVersion(t *testing.T) {
 	t.Run("Text version", func(t *testing.T) {
-		mockAdapter := mocks.Adapter{}
+		adapter := spaggiari.Adapter{}
 
 		stdout := bytes.Buffer{}
 		stderr := bytes.Buffer{}
 		fb := feedback.New(&stdout, &stderr, feedback.Text)
 		feedback.SetDefault(fb)
 
-		uow := commands.UnitOfWork{Adapter: &mockAdapter, Feedback: fb}
+		uow := commands.UnitOfWork{Adapter: adapter, Feedback: fb}
 
 		cmd := commands.VersionCommand{}
 
@@ -31,14 +31,14 @@ func TestVersion(t *testing.T) {
 	})
 
 	t.Run("JSON version", func(t *testing.T) {
-		mockAdapter := mocks.Adapter{}
+		adapter := spaggiari.Adapter{}
 
 		stdout := bytes.Buffer{}
 		stderr := bytes.Buffer{}
 		fb := feedback.New(&stdout, &stderr, feedback.JSON)
 		feedback.SetDefault(fb)
 
-		uow := commands.UnitOfWork{Adapter: &mockAdapter, Feedback: fb}
+		uow := commands.UnitOfWork{Adapter: adapter, Feedback: fb}
 
 		cmd := commands.VersionCommand{}
 

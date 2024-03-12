@@ -10,6 +10,7 @@ type Command interface {
 }
 
 type UnitOfWork struct {
+	// GradesReceiver spaggiari.GradesReceiver
 	Adapter  spaggiari.Adapter
 	Feedback *feedback.Feedback
 }

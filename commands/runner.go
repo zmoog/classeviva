@@ -34,7 +34,7 @@ func NewRunner() (Runner, error) {
 		return Runner{}, fmt.Errorf("failed to get the user home dir: %w", err)
 	}
 
-	adapter, err := spaggiari.From(usernane, password, identityStorePath)
+	adapter, err := spaggiari.New(usernane, password, identityStorePath)
 	if err != nil {
 		return Runner{}, err
 	}
