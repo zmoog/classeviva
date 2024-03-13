@@ -39,4 +39,12 @@ type Noticeboard struct {
 	Read            bool   `json:"readStatus"`
 	PublicationDate string `json:"pubDT"`
 	EventCode       string `json:"evtCode"`
+	Valid           bool   `json:"cntValidInRange"`
+	Status          string `json:"cntStatus"`
+	Category        string `json:"cntCategory"`
+	HasAttachments  bool   `json:"cntHasAttach"`
+	Attachments     []struct {
+		Name   string `json:"fileName"`
+		Number int    `json:"attachNum"`
+	} `json:"cntAttach"`
 }
