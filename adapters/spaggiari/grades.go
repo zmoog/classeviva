@@ -24,7 +24,7 @@ func (r gradeReceiver) List() ([]Grade, error) {
 	err = r.Client.Get(url, func(body []byte) error {
 		envelope := map[string][]Grade{}
 
-		err = json.Unmarshal(body, &envelope)
+		err := json.Unmarshal(body, &envelope)
 		if err != nil {
 			return err
 		}
@@ -33,6 +33,9 @@ func (r gradeReceiver) List() ([]Grade, error) {
 
 		return nil
 	})
+	if err != nil {
+		return []Grade{}, err
+	}
 
 	return grades, nil
 }

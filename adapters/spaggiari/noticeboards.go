@@ -24,7 +24,7 @@ func (r noticeboardsReceiver) List() ([]Noticeboard, error) {
 	err = r.Client.Get(url, func(body []byte) error {
 		envelope := map[string][]Noticeboard{}
 
-		err = json.Unmarshal(body, &envelope)
+		err := json.Unmarshal(body, &envelope)
 		if err != nil {
 			return err
 		}
@@ -33,6 +33,9 @@ func (r noticeboardsReceiver) List() ([]Noticeboard, error) {
 
 		return nil
 	})
+	if err != nil {
+		return []Noticeboard{}, err
+	}
 
 	return items, nil
 }

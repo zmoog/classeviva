@@ -30,7 +30,7 @@ func (r agendaReceiver) List(since, until time.Time) ([]AgendaEntry, error) {
 	err = r.Client.Get(url, func(body []byte) error {
 		envelope := map[string][]AgendaEntry{}
 
-		err = json.Unmarshal(body, &envelope)
+		err := json.Unmarshal(body, &envelope)
 		if err != nil {
 			return err
 		}
@@ -39,6 +39,9 @@ func (r agendaReceiver) List(since, until time.Time) ([]AgendaEntry, error) {
 
 		return nil
 	})
+	if err != nil {
+		return []AgendaEntry{}, err
+	}
 
 	return entries, nil
 }
