@@ -22,3 +22,12 @@ dist/
 
 # gon
 unused.*.zip
+
+# python
+venv
+
+# jetbrains ides
+.idea
+
+# misc
+*.pdf
