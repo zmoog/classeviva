@@ -46,5 +46,5 @@ type Noticeboard struct {
 	Attachments     []struct {
 		Name   string `json:"fileName"`
 		Number int    `json:"attachNum"`
-	} `json:"cntAttach"`
+	} `json:"attachments"`
 }
