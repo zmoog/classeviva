@@ -1,9 +1,14 @@
 package spaggiari
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type NoticeboardsReceiver interface {
 	List() ([]Noticeboard, error)
+	DownloadAttachment(publicationID int, attachmentSequenceNumber int) ([]byte, error)
+	SetAsRead(eventCode string, publicationID int) error
 }
 
 type noticeboardsReceiver struct {
@@ -38,4 +43,39 @@ func (r noticeboardsReceiver) List() ([]Noticeboard, error) {
 	}
 
 	return items, nil
+}
+
+func (r noticeboardsReceiver) SetAsRead(eventCode string, publicationID int) error {
+
+	identity, err := r.IdentityProvider.Get()
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("%s/students/%s/noticeboard/read/%s/%d", baseUrl, identity.ID, eventCode, publicationID)
+
+	return r.Client.Post(url, func(body []byte) error {
+		// I'm not interested in the response body if the request was successful.
+		return nil
+	})
+}
+
+func (r noticeboardsReceiver) DownloadAttachment(publicationID int, attachmentSequenceNumber int) ([]byte, error) {
+	identity, err := r.IdentityProvider.Get()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	url := fmt.Sprintf("%s/students/%s/noticeboard/attach/CF/%d/%d", baseUrl, identity.ID, publicationID, attachmentSequenceNumber)
+	document := []byte{}
+
+	err = r.Client.Get(url, func(body []byte) error {
+		document = body
+		return nil
+	})
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return document, nil
 }

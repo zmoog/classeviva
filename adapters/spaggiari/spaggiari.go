@@ -84,7 +84,43 @@ func (c SpaggiariClient) Get(url string, unmarshal Unmarshal) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("failed to fetch grades, status_code: %d", resp.StatusCode)
+		return fmt.Errorf("failed to GET, status_code: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	log.Trace(string(body))
+
+	err = unmarshal(body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c SpaggiariClient) Post(url string, unmarshal Unmarshal) error {
+	// This is a dummy function to make the linter happy
+	identity, err := c.identityProvider.Get()
+	if err != nil {
+		return err
+	}
+
+	req, err := newRequest("POST", url, nil, identity)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("failed to POST, status_code: %d", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
