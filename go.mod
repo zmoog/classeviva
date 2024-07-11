@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/jedib0t/go-pretty/v6 v6.3.1
-	github.com/sirupsen/logrus v1.8.1
+	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
 )
