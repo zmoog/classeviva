@@ -15,7 +15,7 @@ type ListGradesCommand struct {
 
 func (c ListGradesCommand) ExecuteWith(uow UnitOfWork) error {
 
-	grades, err := uow.Adapter.List()
+	grades, err := uow.Adapter.Grades.List()
 	if err != nil {
 		return err
 	}

@@ -102,8 +102,8 @@ func TestFilesystemLoaderStorer(t *testing.T) {
 func TestIdentityProvider(t *testing.T) {
 
 	t.Run("Get existent valid identity", func(t *testing.T) {
-		fetcher := &mocks.Fetcher{}
-		loaderStorer := &mocks.LoaderStorer{}
+		fetcher := mocks.NewFetcher(t)
+		loaderStorer := mocks.NewLoaderStorer(t)
 
 		identityProvider := spaggiari.IdentityProvider{
 			Fetcher:      fetcher,
@@ -223,15 +223,14 @@ Reference&#32;&#35;18&#46;a6b93554&#46;1651609703&#46;877e15
 		// create a new reader with that JSON
 		r := io.NopCloser(bytes.NewReader([]byte(response)))
 
+		httpClient := mocks.NewHTTPClient(t)
+		httpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
+			StatusCode: 403,
+			Body:       r,
+		}, nil)
+
 		fetcher := spaggiari.IdentityFetcher{
-			Client: &mocks.MockClient{
-				MockDo: func(req *http.Request) (*http.Response, error) {
-					return &http.Response{
-						StatusCode: 403,
-						Body:       r,
-					}, nil
-				},
-			},
+			Client: httpClient,
 		}
 
 		_, err := fetcher.Fetch()

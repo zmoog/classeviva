@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
 
@@ -34,15 +33,15 @@ func NewRunner() (Runner, error) {
 		return Runner{}, fmt.Errorf("failed to get the user home dir: %w", err)
 	}
 
-	adapter, err := spaggiari.From(usernane, password, identityStorePath)
+	adapter, err := spaggiari.New(usernane, password, identityStorePath)
 	if err != nil {
 		return Runner{}, err
 	}
 
 	runner := Runner{
 		uow: UnitOfWork{
-			Adapter:  adapter,
-			Feedback: feedback.Default(),
+			Adapter: adapter,
+			// Feedback: feedback.Default(),
 		},
 	}
 
