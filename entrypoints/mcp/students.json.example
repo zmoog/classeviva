@@ -1,0 +1,16 @@
+{
+  "students": [
+    {
+      "id": "student1",
+      "name": "First Student",
+      "username": "YOUR_CLASSEVIVA_USERNAME",
+      "password": "YOUR_CLASSEVIVA_PASSWORD"
+    },
+    {
+      "id": "student2",
+      "name": "Second Student",
+      "username": "YOUR_CLASSEVIVA_USERNAME",
+      "password": "YOUR_CLASSEVIVA_PASSWORD"
+    }
+  ]
+}

@@ -12,7 +12,16 @@ The MCP server provides tools to:
 
 ## Configuration
 
-The MCP server requires a configuration file at `~/.classeviva/students.json` with student credentials:
+The MCP server requires a configuration file at `~/.classeviva/students.json` with student credentials.
+
+You can copy the example configuration file:
+
+```bash
+cp entrypoints/mcp/students.json.example ~/.classeviva/students.json
+chmod 600 ~/.classeviva/students.json
+```
+
+Then edit `~/.classeviva/students.json` with your credentials:
 
 ```json
 {
@@ -33,11 +42,27 @@ The MCP server requires a configuration file at `~/.classeviva/students.json` wi
 }
 ```
 
-**Security Note**: The configuration file is created with permissions `0600` (owner read/write only) to protect sensitive credentials.
+**Security Note**: The configuration file should have permissions `0600` (owner read/write only) to protect sensitive credentials.
 
-## Building
+## Installation
 
-Build the MCP server:
+### Quick Install
+
+Run the installation script:
+
+```bash
+cd /path/to/classeviva
+./entrypoints/mcp/install.sh
+```
+
+This will:
+1. Build the MCP server binary
+2. Install it to `/usr/local/bin` or `~/.local/bin`
+3. Create a configuration template at `~/.classeviva/students.json`
+
+### Manual Build
+
+Alternatively, build the MCP server manually:
 
 ```bash
 go build -o classeviva-mcp ./entrypoints/mcp/main.go
