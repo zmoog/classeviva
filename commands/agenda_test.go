@@ -15,19 +15,21 @@ import (
 
 func TestListAgendaCommand(t *testing.T) {
 	t.Run("Empty agenda items list", func(t *testing.T) {
-		mockAdapter := mocks.Adapter{}
-		mockAdapter.On(
-			"ListAgenda",
+		agendaReceiver := mocks.NewAgendaReceiver(t)
+		agendaReceiver.On(
+			"List",
 			mock.AnythingOfType("time.Time"),
 			mock.AnythingOfType("time.Time"),
 		).Return([]spaggiari.AgendaEntry{}, nil)
+
+		adapter := spaggiari.Adapter{Agenda: agendaReceiver}
 
 		stdout := bytes.Buffer{}
 		stderr := bytes.Buffer{}
 		fb := feedback.New(&stdout, &stderr, feedback.Text)
 		feedback.SetDefault(fb)
 
-		uow := commands.UnitOfWork{Adapter: &mockAdapter, Feedback: fb}
+		uow := commands.UnitOfWork{Adapter: adapter}
 
 		cmd := commands.ListAgendaCommand{Limit: 10}
 
@@ -35,8 +37,6 @@ func TestListAgendaCommand(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, stdout.String(), "No entries in this interval.")
 		assert.Equal(t, stderr.String(), "")
-
-		mockAdapter.AssertExpectations(t)
 	})
 
 	t.Run("List 5 agenda entries", func(t *testing.T) {
@@ -45,19 +45,21 @@ func TestListAgendaCommand(t *testing.T) {
 			t.Error(err)
 		}
 
-		mockAdapter := mocks.Adapter{}
-		mockAdapter.On(
-			"ListAgenda",
+		agendaReceiver := mocks.NewAgendaReceiver(t)
+		agendaReceiver.On(
+			"List",
 			mock.AnythingOfType("time.Time"),
 			mock.AnythingOfType("time.Time"),
 		).Return(entries, nil)
+
+		adapter := spaggiari.Adapter{Agenda: agendaReceiver}
 
 		stdout := bytes.Buffer{}
 		stderr := bytes.Buffer{}
 		fb := feedback.New(&stdout, &stderr, feedback.Text)
 		feedback.SetDefault(fb)
 
-		uow := commands.UnitOfWork{Adapter: &mockAdapter, Feedback: fb}
+		uow := commands.UnitOfWork{Adapter: adapter}
 		cmd := commands.ListAgendaCommand{Limit: 10}
 
 		err := cmd.ExecuteWith(uow)
@@ -70,7 +72,5 @@ func TestListAgendaCommand(t *testing.T) {
 
 		assert.Equal(t, stdout.String(), string(expected))
 		assert.Equal(t, stderr.String(), "")
-
-		mockAdapter.AssertExpectations(t)
 	})
 }

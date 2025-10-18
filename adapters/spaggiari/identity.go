@@ -207,15 +207,14 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 		return Identity{}, fmt.Errorf("fetcher: failed to unmarshal identity %w", err)
 	}
 
-	// The identity ID is made of the `ident` without the leading
-	// and trailing characters.
-	// For example, with
-	//   `ident = G9123456R`
-	//   `id = 9123456`
-	// without the leading `G` and the trailing `R`.
+	// The student ID can be obtained from the `ident` field
+	// value, by removing the leading and trailing characters.
 	//
-	// The ID is required to make calls to other endpoints, like grades,
-	// agenda, and so on.
+	// For example, with `ident = "G9123456R"` the student ID is
+	// `9123456` (without the leading `G` and the trailing `R`).
+	//
+	// The student ID is required to make calls to other endpoints,
+	// such as grades, agenda, noticeboards, and so on.
 	m := regexp.MustCompile(`\D`)
 	identity.ID = m.ReplaceAllString(identity.Ident, "")
 

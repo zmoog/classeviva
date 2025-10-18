@@ -16,7 +16,7 @@ type ListAgendaCommand struct {
 }
 
 func (c ListAgendaCommand) ExecuteWith(uow UnitOfWork) error {
-	entries, err := uow.Adapter.ListAgenda(c.Since, c.Until)
+	entries, err := uow.Adapter.Agenda.List(c.Since, c.Until)
 	if err != nil {
 		return err
 	}
