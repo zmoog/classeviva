@@ -15,14 +15,14 @@ import (
 
 func TestListAgendaCommand(t *testing.T) {
 	t.Run("Empty agenda items list", func(t *testing.T) {
-		agendaReveiver := mocks.NewAgendaReceiver(t)
-		agendaReveiver.On(
+		agendaReceiver := mocks.NewAgendaReceiver(t)
+		agendaReceiver.On(
 			"List",
 			mock.AnythingOfType("time.Time"),
 			mock.AnythingOfType("time.Time"),
 		).Return([]spaggiari.AgendaEntry{}, nil)
 
-		adapter := spaggiari.Adapter{Agenda: agendaReveiver}
+		adapter := spaggiari.Adapter{Agenda: agendaReceiver}
 
 		stdout := bytes.Buffer{}
 		stderr := bytes.Buffer{}
@@ -45,14 +45,14 @@ func TestListAgendaCommand(t *testing.T) {
 			t.Error(err)
 		}
 
-		agendaReveiver := mocks.NewAgendaReceiver(t)
-		agendaReveiver.On(
+		agendaReceiver := mocks.NewAgendaReceiver(t)
+		agendaReceiver.On(
 			"List",
 			mock.AnythingOfType("time.Time"),
 			mock.AnythingOfType("time.Time"),
 		).Return(entries, nil)
 
-		adapter := spaggiari.Adapter{Agenda: agendaReveiver}
+		adapter := spaggiari.Adapter{Agenda: agendaReceiver}
 
 		stdout := bytes.Buffer{}
 		stderr := bytes.Buffer{}
