@@ -8,6 +8,7 @@ import (
 	"github.com/zmoog/classeviva/entrypoints/cli/cmd/grades"
 	"github.com/zmoog/classeviva/entrypoints/cli/cmd/noticeboards"
 	"github.com/zmoog/classeviva/entrypoints/cli/cmd/version"
+	"github.com/zmoog/classeviva/entrypoints/cli/config"
 )
 
 var (
@@ -24,6 +25,8 @@ func Execute() {
 
 	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Print debug information")
 	rootCmd.PersistentFlags().StringVarP(&format, "format", "f", "text", "Output format")
+	rootCmd.PersistentFlags().StringVarP(&config.Username, "username", "u", "", "Classeviva username (or set CLASSEVIVA_USERNAME)")
+	rootCmd.PersistentFlags().StringVarP(&config.Password, "password", "p", "", "Classeviva password (or set CLASSEVIVA_PASSWORD)")
 
 	rootCmd.AddCommand(agenda.NewCommand())
 	rootCmd.AddCommand(grades.NewCommand())

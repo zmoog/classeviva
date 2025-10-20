@@ -3,6 +3,7 @@ package noticeboards
 import (
 	"github.com/spf13/cobra"
 	"github.com/zmoog/classeviva/commands"
+	"github.com/zmoog/classeviva/entrypoints/cli/config"
 )
 
 func initListCommand() *cobra.Command {
@@ -15,10 +16,11 @@ func initListCommand() *cobra.Command {
 	return &listCommand
 }
 
-func runListCommand(cmd *cobra.Command, args []string) error {
+func runListCommand(cobraCmd *cobra.Command, args []string) error {
 	command := commands.ListNoticeboardsCommand{}
 
-	runner, err := commands.NewRunner()
+	username, password := config.GetCredentials()
+	runner, err := commands.NewRunner(username, password)
 	if err != nil {
 		return err
 	}

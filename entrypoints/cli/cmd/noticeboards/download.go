@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zmoog/classeviva/commands"
+	"github.com/zmoog/classeviva/entrypoints/cli/config"
 )
 
 var (
@@ -25,7 +26,7 @@ func initDownloadCommand() *cobra.Command {
 	return &downloadCommand
 }
 
-func runDownloadCommand(cmd *cobra.Command, args []string) error {
+func runDownloadCommand(cobraCmd *cobra.Command, args []string) error {
 	if publicationID == 0 {
 		return fmt.Errorf("publication_id is required")
 	}
@@ -39,7 +40,8 @@ func runDownloadCommand(cmd *cobra.Command, args []string) error {
 		OutputBasePath: outputDir,
 	}
 
-	runner, err := commands.NewRunner()
+	username, password := config.GetCredentials()
+	runner, err := commands.NewRunner(username, password)
 	if err != nil {
 		return err
 	}

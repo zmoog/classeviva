@@ -3,6 +3,7 @@ package grades
 import (
 	"github.com/spf13/cobra"
 	"github.com/zmoog/classeviva/commands"
+	"github.com/zmoog/classeviva/entrypoints/cli/config"
 )
 
 var (
@@ -21,12 +22,13 @@ func initListCommand() *cobra.Command {
 	return &listCommand
 }
 
-func runListCommand(cmd *cobra.Command, args []string) error {
+func runListCommand(cobraCmd *cobra.Command, args []string) error {
 	command := commands.ListGradesCommand{
 		Limit: limit,
 	}
 
-	runner, err := commands.NewRunner()
+	username, password := config.GetCredentials()
+	runner, err := commands.NewRunner(username, password)
 	if err != nil {
 		return err
 	}

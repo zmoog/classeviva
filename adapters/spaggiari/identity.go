@@ -85,7 +85,8 @@ func (ls *InMemoryLoaderStorer) Store(identity Identity) error {
 
 // FilesystemLoaderStorer loads and stores an Identity using the file system as a backing storage.
 type FilesystemLoaderStorer struct {
-	Path string
+	Path     string
+	Username string
 }
 
 func (ls FilesystemLoaderStorer) Load() (Identity, bool, error) {
@@ -94,7 +95,7 @@ func (ls FilesystemLoaderStorer) Load() (Identity, bool, error) {
 		return noIdentity, false, err
 	}
 
-	configFilePath := filepath.Join(path, "identity.json")
+	configFilePath := filepath.Join(path, ls.getIdentityFileName())
 
 	if _, err := os.Stat(configFilePath); errors.Is(err, os.ErrNotExist) {
 		log.Debugf("identity file [%s] does not exist", configFilePath)
@@ -127,7 +128,7 @@ func (ls FilesystemLoaderStorer) Store(identity Identity) error {
 		return err
 	}
 
-	err = os.WriteFile(filepath.Join(path, "identity.json"), data, 0700)
+	err = os.WriteFile(filepath.Join(path, ls.getIdentityFileName()), data, 0700)
 	if err != nil {
 		return err
 	}
@@ -145,6 +146,13 @@ func (ls FilesystemLoaderStorer) getSettingsDir() (string, error) {
 	}
 
 	return path, err
+}
+
+func (ls FilesystemLoaderStorer) getIdentityFileName() string {
+	if ls.Username != "" {
+		return fmt.Sprintf("identity-%s.json", ls.Username)
+	}
+	return "identity.json"
 }
 
 type Fetcher interface {

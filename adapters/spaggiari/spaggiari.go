@@ -24,7 +24,8 @@ func New(username, password, identityStorePath string) (Adapter, error) {
 			Client:   &httpClient,
 		},
 		LoaderStorer: FilesystemLoaderStorer{
-			Path: identityStorePath,
+			Path:     identityStorePath,
+			Username: username,
 		},
 	}
 

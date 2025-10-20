@@ -21,11 +21,20 @@ func (r Runner) Run(command Command) error {
 	return nil
 }
 
-func NewRunner() (Runner, error) {
-	usernane := os.Getenv("CLASSEVIVA_USERNAME")
-	password := os.Getenv("CLASSEVIVA_PASSWORD")
-	if usernane == "" || password == "" {
-		return Runner{}, errors.New("CLASSEVIVA_USERNAME or CLASSEVIVA_PASSWORD environment variables are empty")
+func NewRunner(cliUsername, cliPassword string) (Runner, error) {
+	// Use CLI flags if provided, otherwise fall back to environment variables
+	username := cliUsername
+	password := cliPassword
+
+	if username == "" {
+		username = os.Getenv("CLASSEVIVA_USERNAME")
+	}
+	if password == "" {
+		password = os.Getenv("CLASSEVIVA_PASSWORD")
+	}
+
+	if username == "" || password == "" {
+		return Runner{}, errors.New("username and password must be provided via CLI flags (--username, --password) or environment variables (CLASSEVIVA_USERNAME, CLASSEVIVA_PASSWORD)")
 	}
 
 	identityStorePath, err := os.UserHomeDir()
@@ -33,7 +42,7 @@ func NewRunner() (Runner, error) {
 		return Runner{}, fmt.Errorf("failed to get the user home dir: %w", err)
 	}
 
-	adapter, err := spaggiari.New(usernane, password, identityStorePath)
+	adapter, err := spaggiari.New(username, password, identityStorePath)
 	if err != nil {
 		return Runner{}, err
 	}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zmoog/classeviva/commands"
+	"github.com/zmoog/classeviva/entrypoints/cli/config"
 )
 
 var (
@@ -45,7 +46,8 @@ func runListCommand(cmd *cobra.Command, args []string) error {
 		Until: _until,
 	}
 
-	runner, err := commands.NewRunner()
+	username, password := config.GetCredentials()
+	runner, err := commands.NewRunner(username, password)
 	if err != nil {
 		return err
 	}

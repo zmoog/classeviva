@@ -3,6 +3,7 @@ package version
 import (
 	"github.com/spf13/cobra"
 	"github.com/zmoog/classeviva/commands"
+	"github.com/zmoog/classeviva/entrypoints/cli/config"
 )
 
 func NewCommand() *cobra.Command {
@@ -15,10 +16,11 @@ func NewCommand() *cobra.Command {
 	return &cmd
 }
 
-func runVersionCommand(cmd *cobra.Command, args []string) error {
+func runVersionCommand(cobraCmd *cobra.Command, args []string) error {
 	command := commands.VersionCommand{}
 
-	runner, err := commands.NewRunner()
+	username, password := config.GetCredentials()
+	runner, err := commands.NewRunner(username, password)
 	if err != nil {
 		return err
 	}
