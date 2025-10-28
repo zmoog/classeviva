@@ -28,6 +28,7 @@ type AgendaEntry struct {
 	Notes         string `json:"notes"`            // "notes": "Page 201 tutti gli esercizi",
 	AuthorName    string `json:"authorName"`       // "authorName": "PESANDO MARGHERITA",
 	Subject       string `json:"subjectDesc"`      // "INGLESE",
+	IsFullDay     bool   `json:"isFullDay"`
 	// "classDesc": "2E MUSICALE",
 	// "subjectId": 396137,
 	// "homeworkId": null

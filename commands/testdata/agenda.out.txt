@@ -1,10 +1,9 @@
-+---------------------------+---------------------------+------------+--------------------+-------------------------------------------------------------------------------------+
-| BEGIN                     | END                       | SUBJECT    | TEACHER            | NOTES                                                                               |
-+---------------------------+---------------------------+------------+--------------------+-------------------------------------------------------------------------------------+
-| 2022-05-02T09:00:00+02:00 | 2022-05-02T10:00:00+02:00 |            | PESANDO MARGHERITA | Inizio interrogazioni di inglese (1º turno)                                         |
-| 2022-05-03T12:00:00+02:00 | 2022-05-03T13:00:00+02:00 |            | ROMEO ENRICA       | studiare bene la regola di p.139 e il verbo di p. 141; ex p. 139 n.3-4; p. 141 n.10 |
-| 2022-05-04T08:00:00+02:00 | 2022-05-04T09:00:00+02:00 |            | PESANDO MARGHERITA | 2º turno interrogazioni inglese                                                     |
-| 2022-05-04T12:00:00+02:00 | 2022-05-04T13:00:00+02:00 |            | MEGNA VALERIA      | Consegna Programma di Lavoro EDIL-LAB  (v. spiegazioni in Classroom)                |
-| 2022-05-05T11:00:00+02:00 | 2022-05-05T12:00:00+02:00 | MATEMATICA | ULLA ALICE         | Geometria: pagina 50 n.217-218.                                                     |
-| 2022-05-09T09:00:00+02:00 | 2022-05-09T10:00:00+02:00 |            | PESANDO MARGHERITA | 3º turno interrogazioni inglese                                                     |
-+---------------------------+---------------------------+------------+--------------------+-------------------------------------------------------------------------------------+
+[106;30m TIME                                [0m[106;30m SUBJECT    [0m[106;30m TEACHER            [0m[106;30m NOTES                                              [0m
+[107;30m 02-05-2022 09:00 - 02-05-2022 10:00 [0m[107;30m -          [0m[107;30m PESANDO MARGHERITA [0m[107;30m Inizio interrogazioni di inglese (1º turno)        [0m
+[47;30m 03-05-2022 12:00 - 03-05-2022 13:00 [0m[47;30m -          [0m[47;30m ROMEO ENRICA       [0m[47;30m studiare bene la regola di p.139 e il verbo di p.  [0m
+[47;30m                                     [0m[47;30m            [0m[47;30m                    [0m[47;30m 141; ex p. 139 n.3-4; p. 141 n.10                  [0m
+[107;30m 04-05-2022 08:00 - 04-05-2022 09:00 [0m[107;30m -          [0m[107;30m PESANDO MARGHERITA [0m[107;30m 2º turno interrogazioni inglese                    [0m
+[47;30m 04-05-2022 12:00 - 04-05-2022 13:00 [0m[47;30m -          [0m[47;30m MEGNA VALERIA      [0m[47;30m Consegna Programma di Lavoro EDIL-LAB (v.          [0m
+[47;30m                                     [0m[47;30m            [0m[47;30m                    [0m[47;30m spiegazioni in Classroom)                          [0m
+[107;30m 05-05-2022 11:00 - 05-05-2022 12:00 [0m[107;30m MATEMATICA [0m[107;30m ULLA ALICE         [0m[107;30m Geometria: pagina 50 n.217-218.                    [0m
+[47;30m 09-05-2022 09:00 - 09-05-2022 10:00 [0m[47;30m -          [0m[47;30m PESANDO MARGHERITA [0m[47;30m 3º turno interrogazioni inglese                    [0m
