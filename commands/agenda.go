@@ -1,10 +1,12 @@
 package commands
 
 import (
+	"fmt"
 	"sort"
 	"time"
 
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/zmoog/classeviva/adapters/feedback"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
@@ -47,16 +49,30 @@ func (r AgendaEntriesResult) String() string {
 	}
 
 	t := table.NewWriter()
+	t.SetStyle(table.StyleColoredBright)
 	t.SetColumnConfigs([]table.ColumnConfig{{Number: 1, AutoMerge: true}})
 
-	t.AppendHeader(table.Row{"Begin", "End", "Subject", "Teacher", "Notes"})
+	t.AppendHeader(table.Row{"Time", "Subject", "Teacher", "Notes"})
 	for _, e := range r.Entries {
+		// Optimize the time formatting for visualization
+		datetimeBegin, _ := time.Parse(time.RFC3339, e.DatetimeBegin)
+		datetimeEnd, _ := time.Parse(time.RFC3339, e.DatetimeEnd)
+		timeInt := fmt.Sprintf("%s - %s", datetimeBegin.Format("02-01-2006 15:04"), datetimeEnd.Format("02-01-2006 15:04"))
+		if e.IsFullDay {
+			timeInt = fmt.Sprintf("%s (all day)", datetimeBegin.Format("02-01-2006"))
+		}
+
+		// Use a placeholder for the subject if it's empty
+		subject := "-"
+		if e.Subject != "" {
+			subject = e.Subject
+		}
+
 		t.AppendRow(table.Row{
-			e.DatetimeBegin,
-			e.DatetimeEnd,
-			e.Subject,
+			timeInt,
+			subject,
 			e.AuthorName,
-			e.Notes,
+			text.WrapSoft(e.Notes, 50),
 		})
 	}
 
