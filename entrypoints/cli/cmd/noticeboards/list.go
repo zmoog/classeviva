@@ -15,10 +15,19 @@ func initListCommand() *cobra.Command {
 	return &listCommand
 }
 
-func runListCommand(cmd *cobra.Command, args []string) error {
+func runListCommand(cobraCmd *cobra.Command, args []string) error {
 	command := commands.ListNoticeboardsCommand{}
 
-	runner, err := commands.NewRunner()
+	// Get flags from parent command (persistent flags)
+	profile, _ := cobraCmd.Flags().GetString("profile")
+	username, _ := cobraCmd.Flags().GetString("username")
+	password, _ := cobraCmd.Flags().GetString("password")
+
+	runner, err := commands.NewRunner(commands.RunnerOptions{
+		Username: username,
+		Password: password,
+		Profile:  profile,
+	})
 	if err != nil {
 		return err
 	}

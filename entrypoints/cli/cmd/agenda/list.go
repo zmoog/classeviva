@@ -23,12 +23,12 @@ func initListCommand() *cobra.Command {
 
 	listCommand.Flags().IntVarP(&limit, "limit", "l", limit, "Limit number of results")
 	listCommand.Flags().StringVarP(&since, "since", "s", time.Now().Format("2006-01-02"), "Day to summarize (format: YYYY-MM-DD)")
-	listCommand.Flags().StringVarP(&until, "until", "u", time.Now().Add(3*24*time.Hour).Format("2006-01-02"), "Day to summarize (format: YYYY-MM-DD)")
+	listCommand.Flags().StringVar(&until, "until", time.Now().Add(3*24*time.Hour).Format("2006-01-02"), "Day to summarize (format: YYYY-MM-DD)")
 
 	return &listCommand
 }
 
-func runListCommand(cmd *cobra.Command, args []string) error {
+func runListCommand(cobraCmd *cobra.Command, args []string) error {
 	_since, err := time.Parse("2006-01-02", since)
 	if err != nil {
 		return fmt.Errorf("invalid 'since' value: %w", err)
@@ -45,7 +45,16 @@ func runListCommand(cmd *cobra.Command, args []string) error {
 		Until: _until,
 	}
 
-	runner, err := commands.NewRunner()
+	// Get flags from parent command (persistent flags)
+	profile, _ := cobraCmd.Flags().GetString("profile")
+	username, _ := cobraCmd.Flags().GetString("username")
+	password, _ := cobraCmd.Flags().GetString("password")
+
+	runner, err := commands.NewRunner(commands.RunnerOptions{
+		Username: username,
+		Password: password,
+		Profile:  profile,
+	})
 	if err != nil {
 		return err
 	}

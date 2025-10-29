@@ -15,7 +15,7 @@ func NewSpaggiariClient(identityProvider Provider) SpaggiariClient {
 	}
 }
 
-func New(username, password, identityStorePath string) (Adapter, error) {
+func New(username, password, identityStorePath, profile string) (Adapter, error) {
 	httpClient := http.Client{}
 	identityProvider := IdentityProvider{
 		Fetcher: IdentityFetcher{
@@ -24,7 +24,8 @@ func New(username, password, identityStorePath string) (Adapter, error) {
 			Client:   &httpClient,
 		},
 		LoaderStorer: FilesystemLoaderStorer{
-			Path: identityStorePath,
+			Path:    identityStorePath,
+			Profile: profile,
 		},
 	}
 
