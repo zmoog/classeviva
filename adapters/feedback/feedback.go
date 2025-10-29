@@ -33,11 +33,11 @@ func (fb *Feedback) SetFormat(format OutputFormat) {
 }
 
 func (fb *Feedback) Println(v interface{}) {
-	fmt.Fprintln(fb.out, v)
+	_, _ = fmt.Fprintln(fb.out, v)
 }
 
 func (fb *Feedback) Error(v interface{}) {
-	fmt.Fprintln(fb.err, v)
+	_, _ = fmt.Fprintln(fb.err, v)
 }
 
 func (fb *Feedback) PrintResult(result Result) error {

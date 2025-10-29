@@ -82,7 +82,7 @@ func (c SpaggiariClient) Get(url string, unmarshal Unmarshal) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("failed to GET, status_code: %d", resp.StatusCode)
@@ -118,7 +118,7 @@ func (c SpaggiariClient) Post(url string, unmarshal Unmarshal) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("failed to POST, status_code: %d", resp.StatusCode)

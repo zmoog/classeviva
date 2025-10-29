@@ -199,12 +199,12 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 	if err != nil {
 		return Identity{}, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != 200 {
 		switch resp.StatusCode {
 		case 403:
-			return Identity{}, fmt.Errorf("fetcher: access denied to Classeviva API (status_code: %v). Hit: https://web.spaggiari.eu is not available to call from cloud provider.", resp.StatusCode)
+			return Identity{}, fmt.Errorf("fetcher: access denied to Classeviva API (status_code: %v). Hit: https://web.spaggiari.eu is not available to call from cloud provider", resp.StatusCode)
 		default:
 			return Identity{}, fmt.Errorf("fetcher: failed to fetch identity (status_code: %v)", resp.StatusCode)
 		}

@@ -62,7 +62,7 @@ func Load() (*Config, error) {
 	if err := k.Load(env.Provider("CLASSEVIVA_", ".", func(s string) string {
 		// Transform CLASSEVIVA_PROFILES_OLDER_KID_USERNAME -> profiles.older-kid.username
 		s = strings.Replace(strings.ToLower(s), "classeviva_", "", 1)
-		s = strings.Replace(s, "_", ".", -1)
+		s = strings.ReplaceAll(s, "_", ".")
 		return s
 	}), nil); err != nil {
 		return nil, fmt.Errorf("failed to load environment variables: %w", err)
