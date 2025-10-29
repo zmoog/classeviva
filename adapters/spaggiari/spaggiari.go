@@ -15,7 +15,7 @@ func NewSpaggiariClient(identityProvider Provider) SpaggiariClient {
 	}
 }
 
-func New(username, password, identityStorePath string) (Adapter, error) {
+func New(username, password, identityStorePath, profile string) (Adapter, error) {
 	httpClient := http.Client{}
 	identityProvider := IdentityProvider{
 		Fetcher: IdentityFetcher{
@@ -24,7 +24,8 @@ func New(username, password, identityStorePath string) (Adapter, error) {
 			Client:   &httpClient,
 		},
 		LoaderStorer: FilesystemLoaderStorer{
-			Path: identityStorePath,
+			Path:    identityStorePath,
+			Profile: profile,
 		},
 	}
 
@@ -81,7 +82,7 @@ func (c SpaggiariClient) Get(url string, unmarshal Unmarshal) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("failed to GET, status_code: %d", resp.StatusCode)
@@ -117,7 +118,7 @@ func (c SpaggiariClient) Post(url string, unmarshal Unmarshal) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("failed to POST, status_code: %d", resp.StatusCode)

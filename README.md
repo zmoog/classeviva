@@ -2,6 +2,122 @@
 
 Classeviva is a Go library and CLI tool to access the popular school portal https://web.spaggiari.eu.
 
+## Authentication
+
+Classeviva supports multiple authentication methods with a priority chain, making it easy to manage credentials for multiple students.
+
+### Authentication Priority
+
+Credentials are resolved in the following order (highest priority first):
+
+1. **CLI flags**: `--username` and `--password`
+2. **Profile-based**: `--profile` flag or `default_profile` from config file
+3. **Environment variables**: `CLASSEVIVA_USERNAME` and `CLASSEVIVA_PASSWORD`
+
+### Profile Management (Recommended)
+
+For families with multiple students, profile-based authentication is the recommended approach.
+
+#### Setup Profiles
+
+Add profiles for each student:
+
+```shell
+# Add first student profile
+$ classeviva profile add older-kid
+Username: student1_username
+Password: ********
+
+# Add second student profile
+$ classeviva profile add younger-kid
+Username: student2_username
+Password: ********
+```
+
+#### Set Default Profile
+
+Set a default profile to use when `--profile` is not specified:
+
+```shell
+$ classeviva profile set-default older-kid
+```
+
+#### List Profiles
+
+View all configured profiles:
+
+```shell
+$ classeviva profile list
+PROFILE      DEFAULT
+older-kid    *
+younger-kid
+```
+
+#### Show Profile Details
+
+Display profile information (credentials are hidden):
+
+```shell
+$ classeviva profile show older-kid
+Profile: older-kid
+Username: student1_username
+Password: ********
+```
+
+#### Remove Profile
+
+Delete a profile:
+
+```shell
+$ classeviva profile remove younger-kid
+```
+
+### Using Profiles
+
+Once profiles are configured, use them with any command:
+
+```shell
+# Use default profile
+$ classeviva grades list --limit 10
+
+# Use specific profile
+$ classeviva --profile younger-kid grades list --limit 10
+
+# Override with CLI flags (highest priority)
+$ classeviva --username user --password pass grades list
+```
+
+### Configuration File
+
+Profiles are stored in `~/.classeviva/config.yaml`:
+
+```yaml
+profiles:
+  older-kid:
+    username: "student1_username"
+    password: "student1_password"
+  younger-kid:
+    username: "student2_username"
+    password: "student2_password"
+default_profile: "older-kid"
+```
+
+**Note**: The config file has restrictive permissions (0600) to protect credentials.
+
+### Environment Variables (Legacy)
+
+For backward compatibility, you can still use environment variables:
+
+```shell
+export CLASSEVIVA_USERNAME="your_username"
+export CLASSEVIVA_PASSWORD="your_password"
+$ classeviva grades list
+```
+
+### Identity Caching
+
+Authentication tokens are cached per-profile in `~/.classeviva/identity-{profile}.json` to minimize API calls. Tokens are automatically refreshed when expired.
+
 ## CLI Commands
 
 ### Version

@@ -19,13 +19,13 @@ func initDownloadCommand() *cobra.Command {
 		RunE:  runDownloadCommand,
 	}
 
-	downloadCommand.Flags().IntVarP(&publicationID, "publication_id", "p", publicationID, "Publication ID to download the attachment from")
+	downloadCommand.Flags().IntVar(&publicationID, "publication_id", publicationID, "Publication ID to download the attachment from")
 	downloadCommand.Flags().StringVarP(&outputDir, "output-filename", "o", outputDir, "Output directory for the attachment(s)")
 
 	return &downloadCommand
 }
 
-func runDownloadCommand(cmd *cobra.Command, args []string) error {
+func runDownloadCommand(cobraCmd *cobra.Command, args []string) error {
 	if publicationID == 0 {
 		return fmt.Errorf("publication_id is required")
 	}
@@ -39,7 +39,16 @@ func runDownloadCommand(cmd *cobra.Command, args []string) error {
 		OutputBasePath: outputDir,
 	}
 
-	runner, err := commands.NewRunner()
+	// Get flags from parent command (persistent flags)
+	profile, _ := cobraCmd.Flags().GetString("profile")
+	username, _ := cobraCmd.Flags().GetString("username")
+	password, _ := cobraCmd.Flags().GetString("password")
+
+	runner, err := commands.NewRunner(commands.RunnerOptions{
+		Username: username,
+		Password: password,
+		Profile:  profile,
+	})
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,8 @@
 package version
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/zmoog/classeviva/commands"
 )
@@ -18,9 +20,19 @@ func NewCommand() *cobra.Command {
 func runVersionCommand(cmd *cobra.Command, args []string) error {
 	command := commands.VersionCommand{}
 
-	runner, err := commands.NewRunner()
+	// Version command doesn't need credentials, pass empty options
+	runner, err := commands.NewRunner(commands.RunnerOptions{})
 	if err != nil {
-		return err
+		// Version command doesn't require auth, so just print version without runner
+		// This allows "classeviva version" to work without configuration
+		result := commands.VersionResult{
+			Version: "v0.0.0",
+			Commit:  "123",
+			Date:    "2022-05-08",
+			BuiltBy: "zmoog",
+		}
+		fmt.Println(result.String())
+		return nil
 	}
 
 	err = runner.Run(command)

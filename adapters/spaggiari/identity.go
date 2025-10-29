@@ -85,7 +85,8 @@ func (ls *InMemoryLoaderStorer) Store(identity Identity) error {
 
 // FilesystemLoaderStorer loads and stores an Identity using the file system as a backing storage.
 type FilesystemLoaderStorer struct {
-	Path string
+	Path    string
+	Profile string // Profile name for multi-profile support (empty for backward compatibility)
 }
 
 func (ls FilesystemLoaderStorer) Load() (Identity, bool, error) {
@@ -94,7 +95,9 @@ func (ls FilesystemLoaderStorer) Load() (Identity, bool, error) {
 		return noIdentity, false, err
 	}
 
-	configFilePath := filepath.Join(path, "identity.json")
+	// Determine the identity file name based on profile
+	identityFileName := ls.getIdentityFileName()
+	configFilePath := filepath.Join(path, identityFileName)
 
 	if _, err := os.Stat(configFilePath); errors.Is(err, os.ErrNotExist) {
 		log.Debugf("identity file [%s] does not exist", configFilePath)
@@ -127,12 +130,25 @@ func (ls FilesystemLoaderStorer) Store(identity Identity) error {
 		return err
 	}
 
-	err = os.WriteFile(filepath.Join(path, "identity.json"), data, 0700)
+	// Determine the identity file name based on profile
+	identityFileName := ls.getIdentityFileName()
+	identityFilePath := filepath.Join(path, identityFileName)
+
+	err = os.WriteFile(identityFilePath, data, 0700)
 	if err != nil {
 		return err
 	}
 
 	return err
+}
+
+func (ls FilesystemLoaderStorer) getIdentityFileName() string {
+	if ls.Profile == "" {
+		// Backward compatibility: use old file name when no profile specified
+		return "identity.json"
+	}
+	// Profile-specific identity file
+	return fmt.Sprintf("identity-%s.json", ls.Profile)
 }
 
 func (ls FilesystemLoaderStorer) getSettingsDir() (string, error) {
@@ -183,12 +199,12 @@ func (f IdentityFetcher) Fetch() (Identity, error) {
 	if err != nil {
 		return Identity{}, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != 200 {
 		switch resp.StatusCode {
 		case 403:
-			return Identity{}, fmt.Errorf("fetcher: access denied to Classeviva API (status_code: %v). Hit: https://web.spaggiari.eu is not available to call from cloud provider.", resp.StatusCode)
+			return Identity{}, fmt.Errorf("fetcher: access denied to Classeviva API (status_code: %v). Hit: https://web.spaggiari.eu is not available to call from cloud provider", resp.StatusCode)
 		default:
 			return Identity{}, fmt.Errorf("fetcher: failed to fetch identity (status_code: %v)", resp.StatusCode)
 		}

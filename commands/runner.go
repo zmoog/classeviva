@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
+	"github.com/zmoog/classeviva/adapters/config"
 	"github.com/zmoog/classeviva/adapters/spaggiari"
 )
 
@@ -21,11 +21,39 @@ func (r Runner) Run(command Command) error {
 	return nil
 }
 
-func NewRunner() (Runner, error) {
-	usernane := os.Getenv("CLASSEVIVA_USERNAME")
-	password := os.Getenv("CLASSEVIVA_PASSWORD")
-	if usernane == "" || password == "" {
-		return Runner{}, errors.New("CLASSEVIVA_USERNAME or CLASSEVIVA_PASSWORD environment variables are empty")
+// RunnerOptions contains options for creating a new Runner
+type RunnerOptions struct {
+	Username string
+	Password string
+	Profile  string
+}
+
+func NewRunner(opts RunnerOptions) (Runner, error) {
+	// Run migration check on first use
+	if err := config.MigrateIfNeeded(); err != nil {
+		return Runner{}, fmt.Errorf("failed to migrate config: %w", err)
+	}
+
+	// Load configuration
+	cfg, err := config.Load()
+	if err != nil {
+		return Runner{}, fmt.Errorf("failed to load config: %w", err)
+	}
+
+	// Resolve credentials using the priority chain
+	creds, err := config.ResolveCredentials(config.ResolverOptions{
+		Username: opts.Username,
+		Password: opts.Password,
+		Profile:  opts.Profile,
+		Config:   cfg,
+	})
+	if err != nil {
+		return Runner{}, fmt.Errorf("failed to resolve credentials: %w", err)
+	}
+
+	// Validate credentials
+	if err := config.ValidateCredentials(creds); err != nil {
+		return Runner{}, fmt.Errorf("invalid credentials: %w", err)
 	}
 
 	identityStorePath, err := os.UserHomeDir()
@@ -33,7 +61,7 @@ func NewRunner() (Runner, error) {
 		return Runner{}, fmt.Errorf("failed to get the user home dir: %w", err)
 	}
 
-	adapter, err := spaggiari.New(usernane, password, identityStorePath)
+	adapter, err := spaggiari.New(creds.Username, creds.Password, identityStorePath, creds.Profile)
 	if err != nil {
 		return Runner{}, err
 	}
