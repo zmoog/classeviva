@@ -16,6 +16,7 @@
 
 # Binaries
 classeviva
+classeviva-mcp
 
 # goreleaser
 dist/

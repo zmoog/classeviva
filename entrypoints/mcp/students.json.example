@@ -1,0 +1,15 @@
+# DEPRECATED: This JSON format is no longer used.
+# The MCP server now uses the same YAML-based profile configuration as the CLI.
+#
+# Please use config.yaml instead. See config.yaml.example for the new format.
+#
+# Example config.yaml:
+# profiles:
+#   student1:
+#     username: "YOUR_CLASSEVIVA_USERNAME"
+#     password: "YOUR_CLASSEVIVA_PASSWORD"
+#   student2:
+#     username: "YOUR_CLASSEVIVA_USERNAME"
+#     password: "YOUR_CLASSEVIVA_PASSWORD"
+# default_profile: "student1"
+

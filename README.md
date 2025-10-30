@@ -1,6 +1,39 @@
 # classeviva
 
-Classeviva is a Go library and CLI tool to access the popular school portal https://web.spaggiari.eu.
+Classeviva is a Go library, CLI tool, and MCP server to access the popular school portal https://web.spaggiari.eu.
+
+## Features
+
+- **CLI Tool**: Command-line interface for quick access to grades, agenda, and noticeboards
+- **MCP Server**: Model Context Protocol server for LLM integration (e.g., Claude)
+- **Go Library**: Reusable Go package for building custom integrations
+
+## MCP Server
+
+The MCP (Model Context Protocol) server enables LLMs like Claude to interact with Classeviva. This allows for powerful workflows like:
+
+- Analyzing grades across multiple students
+- Checking homework and upcoming tests
+- Summarizing noticeboard announcements
+- Comparing student performance
+
+For detailed MCP server documentation, see [entrypoints/mcp/README.md](entrypoints/mcp/README.md).
+
+### Quick Start with MCP
+
+1. Build the MCP server:
+   ```bash
+   go build -o classeviva-mcp ./entrypoints/mcp/main.go
+   ```
+
+2. Add profiles using the CLI:
+   ```bash
+   classeviva profile add student1 --username YOUR_USERNAME --password YOUR_PASSWORD
+   classeviva profile add student2 --username YOUR_USERNAME --password YOUR_PASSWORD
+   classeviva profile set-default student1
+   ```
+
+3. Configure Claude Desktop to use the server (see [MCP README](entrypoints/mcp/README.md) for details)
 
 ## Install
 
