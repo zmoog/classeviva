@@ -9,12 +9,12 @@ brew install zmoog/homebrew-classeviva/classeviva
 ```
 
 ```sh
-brew info classeviva   
-==> classeviva: 0.2.0
+brew info zmoog/homebrew-classeviva/classeviva
+==> classeviva: 0.2.1
 
 Installed
-/opt/homebrew/Caskroom/classeviva/0.2.0 (6.8MB)
-  Installed on 2025-10-30 at 14:47:56
+/opt/homebrew/Caskroom/classeviva/0.2.1 (6.8MB)
+  Installed on 2025-10-30 at 23:37:52
 From: https://github.com/zmoog/homebrew-classeviva/blob/HEAD/Casks/classeviva.rb
 ==> Name
 classeviva
