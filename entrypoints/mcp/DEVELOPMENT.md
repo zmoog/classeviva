@@ -39,25 +39,25 @@ Classeviva API (web.spaggiari.eu)
 
 ## Tool Implementations
 
-### list_students
-- Lists all configured students
+### list_profiles
+- Lists all configured profiles
 - No API calls required
 - Reads from configuration file
 
 ### list_grades
-- Requires student_id parameter
+- Requires profile parameter
 - Calls `adapter.Grades.List()`
 - Optional limit parameter for pagination
 
 ### list_agenda
-- Requires student_id parameter
+- Requires profile parameter
 - Calls `adapter.Agenda.List(since, until)`
 - Optional date range and limit parameters
 
 ### list_noticeboards
-- Requires student_id parameter
+- Requires profile parameter
 - Calls `adapter.Noticeboards.List()`
-- Returns all noticeboards for the student
+- Returns all noticeboards for the profile
 
 ## Testing
 
@@ -97,18 +97,18 @@ go test ./...
 ## Security Considerations
 
 ### Credential Storage
-- Credentials stored in `~/.classeviva/students.json`
+- Credentials stored in `~/.classeviva/config.yaml`
 - Recommended file permissions: `0600` (owner read/write only)
 - File created automatically with secure permissions
 
 ### API Authentication
 - Uses existing identity management from Spaggiari adapter
-- Tokens cached in `~/.classeviva/identity.json`
+- Tokens cached in `~/.classeviva/identity-*.json`
 - Token refresh handled automatically
 
 ### No Credential Exposure
 - Credentials never logged or returned in tool results
-- Only student IDs and names exposed to LLM
+- Only profile names exposed to LLM
 - Passwords never transmitted in MCP protocol
 
 ## Adding New Tools
@@ -129,19 +129,19 @@ To add a new MCP tool:
    ```go
    s.AddTool(mcp.NewTool("my_new_tool",
        mcp.WithDescription("Description of the tool"),
-       mcp.WithString("student_id",
-           mcp.Description("The student ID from list_students"),
+       mcp.WithString("profile",
+           mcp.Description("The profile name from list_profiles"),
            mcp.Required(),
        ),
-   ), myNewToolHandler(cfg, studentAdapters))
+   ), myNewToolHandler(cfg, profileAdapters))
    ```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Configuration file not found**
-   - Ensure `~/.classeviva/students.json` exists
+1. **Profiles not found**
+   - Ensure `~/.classeviva/config.yaml` exists and contains at least one student
    - Check file permissions
 
 2. **Authentication failures**

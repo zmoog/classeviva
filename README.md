@@ -26,16 +26,11 @@ For detailed MCP server documentation, see [entrypoints/mcp/README.md](entrypoin
    go build -o classeviva-mcp ./entrypoints/mcp/main.go
    ```
 
-2. Create configuration file at `~/.classeviva/config.yaml`:
-   ```yaml
-   profiles:
-     student1:
-       username: "your_username"
-       password: "your_password"
-     student2:
-       username: "your_username"
-       password: "your_password"
-   default_profile: "student1"
+2. Add profiles using the CLI:
+   ```bash
+   classeviva profile add student1 --username YOUR_USERNAME --password YOUR_PASSWORD
+   classeviva profile add student2 --username YOUR_USERNAME --password YOUR_PASSWORD
+   classeviva profile set-default student1
    ```
 
 3. Configure Claude Desktop to use the server (see [MCP README](entrypoints/mcp/README.md) for details)
