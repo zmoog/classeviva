@@ -1,13 +1,23 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
 before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
     # you may remove this if you don't need go generate
     - go generate ./...
+
+archives:
+  - id: archive
+    builds:
+      - linux
+      - darwin
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format: tar.gz
+    files:
+      - README.md
+      - LICENSE*
+
 builds:
-  - binary: classeviva  
+  - binary: classeviva
     id: classeviva
     ldflags:
       - -s -w -X github.com/zmoog/classeviva/commands.version={{.Version}} -X github.com/zmoog/classeviva/commands.commit={{.Commit}} -X github.com/zmoog/classeviva/commands.date={{.Date}} -X github.com/zmoog/classeviva/commands.builtBy=goreleaser
@@ -15,67 +25,33 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
-      # - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
     main: ./entrypoints/cli
-  
-  #
-  # Uncomment the following lines if you want to use macOS notarization
-  # ---------------------------------------------------------------
-  #
-  # I have commented out the following lines because I don't have a
-  # paid Apple Developer account anymore.
-  # 
-  # Since I'm probably the only one who will ever use this, I'm not
-  # goint to spend $99/year until I have a good reason to do so.
-  #
-    
-  # - binary: classeviva
-  #   id: classeviva-macos-amd64
-  #   ldflags:
-  #     - -s -w -X github.com/zmoog/classeviva/commands.version={{.Version}} -X github.com/zmoog/classeviva/commands.commit={{.Commit}} -X github.com/zmoog/classeviva/commands.date={{.Date}} -X github.com/zmoog/classeviva/commands.builtBy=goreleaser
-  #   env:
-  #     - CGO_ENABLED=0
-  #   goos:
-  #     - darwin
-  #   goarch:
-  #     - amd64
-  #   main: ./entrypoints/cli
-  #   hooks:
-  #     post:
-  #       - cmd: gon gon.config.amd64.hcl
-  #         output: true
-  
-  # - binary: classeviva
-  #   id: classeviva-macos-arm64
-  #   ldflags:
-  #     - -s -w -X github.com/zmoog/classeviva/commands.version={{.Version}} -X github.com/zmoog/classeviva/commands.commit={{.Commit}} -X github.com/zmoog/classeviva/commands.date={{.Date}} -X github.com/zmoog/classeviva/commands.builtBy=goreleaser
-  #   env:
-  #     - CGO_ENABLED=0
-  #   goos:
-  #     - darwin
-  #   goarch:
-  #     - arm64
-  #   main: ./entrypoints/cli
-  #   hooks:
-  #     post:
-  #       - cmd: gon gon.config.arm64.hcl
-  #         output: true
-  
-archives:
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      # windows: Windows
-      #386: i386
-      amd64: x86_64
+
+release:
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  draft: false
+  prerelease: auto
+
+brews:
+  - name: classeviva
+    repository:
+      owner: masci
+      name: homebrew-classeviva
+      branch: main
+
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
+
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
+
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - "^docs:"
+      - "^test:"
