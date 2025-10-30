@@ -26,21 +26,26 @@ func run() error {
 		return fmt.Errorf("failed to get user home dir: %w", err)
 	}
 
-	configLoader := config.Loader{Path: homeDir}
-	cfg, err := configLoader.Load()
+	cfg, err := config.Load()
 	if err != nil {
-		configPath, _ := configLoader.GetConfigPath()
+		configPath, _ := config.GetConfigPath()
 		return fmt.Errorf("failed to load configuration: %w\n\nPlease create a configuration file at: %s\n\nExample format:\n%s",
 			err, configPath, getExampleConfig())
 	}
 
-	studentAdapters := make(map[string]spaggiari.Adapter)
-	for _, student := range cfg.Students {
-		adapter, err := spaggiari.New(student.Username, student.Password, homeDir)
+	if len(cfg.Profiles) == 0 {
+		configPath, _ := config.GetConfigPath()
+		return fmt.Errorf("no profiles configured\n\nPlease add profiles to: %s\n\nExample format:\n%s",
+			configPath, getExampleConfig())
+	}
+
+	profileAdapters := make(map[string]spaggiari.Adapter)
+	for profileName, profile := range cfg.Profiles {
+		adapter, err := spaggiari.New(profile.Username, profile.Password, homeDir, profileName)
 		if err != nil {
-			return fmt.Errorf("failed to create adapter for student %s: %w", student.Name, err)
+			return fmt.Errorf("failed to create adapter for profile %s: %w", profileName, err)
 		}
-		studentAdapters[student.ID] = adapter
+		profileAdapters[profileName] = adapter
 	}
 
 	s := server.NewMCPServer(
@@ -49,29 +54,29 @@ func run() error {
 		server.WithLogging(),
 	)
 
-	s.AddTool(mcp.NewTool("list_students",
-		mcp.WithDescription("List all configured students"),
+	s.AddTool(mcp.NewTool("list_profiles",
+		mcp.WithDescription("List all configured student profiles"),
 		mcp.WithString("format",
 			mcp.Description("Output format: 'text' or 'json'"),
 			mcp.DefaultString("json"),
 		),
-	), listStudentsHandler(cfg))
+	), listProfilesHandler(cfg))
 
 	s.AddTool(mcp.NewTool("list_grades",
-		mcp.WithDescription("List grades for a specific student"),
-		mcp.WithString("student_id",
-			mcp.Description("The student ID from list_students"),
+		mcp.WithDescription("List grades for a specific student profile"),
+		mcp.WithString("profile",
+			mcp.Description("The profile name from list_profiles"),
 			mcp.Required(),
 		),
 		mcp.WithNumber("limit",
 			mcp.Description("Maximum number of grades to return (default: all)"),
 		),
-	), listGradesHandler(cfg, studentAdapters))
+	), listGradesHandler(cfg, profileAdapters))
 
 	s.AddTool(mcp.NewTool("list_agenda",
-		mcp.WithDescription("List agenda items (homework, events) for a specific student"),
-		mcp.WithString("student_id",
-			mcp.Description("The student ID from list_students"),
+		mcp.WithDescription("List agenda items (homework, events) for a specific student profile"),
+		mcp.WithString("profile",
+			mcp.Description("The profile name from list_profiles"),
 			mcp.Required(),
 		),
 		mcp.WithString("since",
@@ -83,15 +88,15 @@ func run() error {
 		mcp.WithNumber("limit",
 			mcp.Description("Maximum number of items to return (default: all)"),
 		),
-	), listAgendaHandler(cfg, studentAdapters))
+	), listAgendaHandler(cfg, profileAdapters))
 
 	s.AddTool(mcp.NewTool("list_noticeboards",
-		mcp.WithDescription("List noticeboard items (announcements, circulars) for a specific student"),
-		mcp.WithString("student_id",
-			mcp.Description("The student ID from list_students"),
+		mcp.WithDescription("List noticeboard items (announcements, circulars) for a specific student profile"),
+		mcp.WithString("profile",
+			mcp.Description("The profile name from list_profiles"),
 			mcp.Required(),
 		),
-	), listNoticeboardsHandler(cfg, studentAdapters))
+	), listNoticeboardsHandler(cfg, profileAdapters))
 
 	if err := server.ServeStdio(s); err != nil {
 		return fmt.Errorf("server error: %w", err)
@@ -100,29 +105,28 @@ func run() error {
 	return nil
 }
 
-func listStudentsHandler(cfg config.Config) server.ToolHandlerFunc {
+func listProfilesHandler(cfg *config.Config) server.ToolHandlerFunc {
 	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		format := request.GetString("format", "json")
 
-		students := make([]map[string]string, 0, len(cfg.Students))
-		for _, student := range cfg.Students {
-			students = append(students, map[string]string{
-				"id":   student.ID,
-				"name": student.Name,
+		profiles := make([]map[string]string, 0, len(cfg.Profiles))
+		for profileName := range cfg.Profiles {
+			profiles = append(profiles, map[string]string{
+				"name": profileName,
 			})
 		}
 
 		var output string
 		if format == "json" {
-			data, err := json.MarshalIndent(students, "", "  ")
+			data, err := json.MarshalIndent(profiles, "", "  ")
 			if err != nil {
-				return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal students: %v", err)), nil
+				return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal profiles: %v", err)), nil
 			}
 			output = string(data)
 		} else {
-			output = "Available students:\n"
-			for _, student := range cfg.Students {
-				output += fmt.Sprintf("- ID: %s, Name: %s\n", student.ID, student.Name)
+			output = "Available profiles:\n"
+			for profileName := range cfg.Profiles {
+				output += fmt.Sprintf("- %s\n", profileName)
 			}
 		}
 
@@ -130,16 +134,16 @@ func listStudentsHandler(cfg config.Config) server.ToolHandlerFunc {
 	}
 }
 
-func listGradesHandler(cfg config.Config, adapters map[string]spaggiari.Adapter) server.ToolHandlerFunc {
+func listGradesHandler(cfg *config.Config, adapters map[string]spaggiari.Adapter) server.ToolHandlerFunc {
 	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		studentID, err := request.RequireString("student_id")
+		profileName, err := request.RequireString("profile")
 		if err != nil {
-			return mcp.NewToolResultError("student_id is required"), nil
+			return mcp.NewToolResultError("profile is required"), nil
 		}
 
-		adapter, ok := adapters[studentID]
+		adapter, ok := adapters[profileName]
 		if !ok {
-			return mcp.NewToolResultError(fmt.Sprintf("Unknown student_id: %s", studentID)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("Unknown profile: %s", profileName)), nil
 		}
 
 		grades, err := adapter.Grades.List()
@@ -161,16 +165,16 @@ func listGradesHandler(cfg config.Config, adapters map[string]spaggiari.Adapter)
 	}
 }
 
-func listAgendaHandler(cfg config.Config, adapters map[string]spaggiari.Adapter) server.ToolHandlerFunc {
+func listAgendaHandler(cfg *config.Config, adapters map[string]spaggiari.Adapter) server.ToolHandlerFunc {
 	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		studentID, err := request.RequireString("student_id")
+		profileName, err := request.RequireString("profile")
 		if err != nil {
-			return mcp.NewToolResultError("student_id is required"), nil
+			return mcp.NewToolResultError("profile is required"), nil
 		}
 
-		adapter, ok := adapters[studentID]
+		adapter, ok := adapters[profileName]
 		if !ok {
-			return mcp.NewToolResultError(fmt.Sprintf("Unknown student_id: %s", studentID)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("Unknown profile: %s", profileName)), nil
 		}
 
 		since := time.Now()
@@ -212,16 +216,16 @@ func listAgendaHandler(cfg config.Config, adapters map[string]spaggiari.Adapter)
 	}
 }
 
-func listNoticeboardsHandler(cfg config.Config, adapters map[string]spaggiari.Adapter) server.ToolHandlerFunc {
+func listNoticeboardsHandler(cfg *config.Config, adapters map[string]spaggiari.Adapter) server.ToolHandlerFunc {
 	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		studentID, err := request.RequireString("student_id")
+		profileName, err := request.RequireString("profile")
 		if err != nil {
-			return mcp.NewToolResultError("student_id is required"), nil
+			return mcp.NewToolResultError("profile is required"), nil
 		}
 
-		adapter, ok := adapters[studentID]
+		adapter, ok := adapters[profileName]
 		if !ok {
-			return mcp.NewToolResultError(fmt.Sprintf("Unknown student_id: %s", studentID)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("Unknown profile: %s", profileName)), nil
 		}
 
 		items, err := adapter.Noticeboards.List()
@@ -239,20 +243,13 @@ func listNoticeboardsHandler(cfg config.Config, adapters map[string]spaggiari.Ad
 }
 
 func getExampleConfig() string {
-	return `{
-  "students": [
-    {
-      "id": "student1",
-      "name": "John Doe",
-      "username": "JOHNdoe123",
-      "password": "password123"
-    },
-    {
-      "id": "student2",
-      "name": "Jane Doe",
-      "username": "JANEDOE456",
-      "password": "password456"
-    }
-  ]
-}`
+	return `profiles:
+  older-kid:
+    username: JOHNdoe123
+    password: password123
+  younger-kid:
+    username: JANEDOE456
+    password: password456
+default_profile: older-kid
+`
 }
