@@ -39,7 +39,7 @@ release:
 homebrew_casks:
   - name: classeviva
     repository:
-      owner: masci
+      owner: zmoog
       name: homebrew-classeviva
       branch: main
     binaries:
