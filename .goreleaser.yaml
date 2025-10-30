@@ -1,3 +1,5 @@
+version: 2
+
 before:
   hooks:
     # You may remove this if you don't use go modules.
@@ -6,12 +8,10 @@ before:
     - go generate ./...
 
 archives:
-  - id: archive
-    builds:
-      - linux
-      - darwin
+  - ids:
+      - classeviva
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    format: tar.gz
+    formats: ["tar.gz"]
     files:
       - README.md
       - LICENSE*
@@ -36,18 +36,25 @@ release:
   draft: false
   prerelease: auto
 
-brews:
+homebrew_casks:
   - name: classeviva
     repository:
       owner: masci
       name: homebrew-classeviva
       branch: main
-
+    binaries:
+      - classeviva
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/classeviva"]
+          end
 checksum:
   name_template: "checksums.txt"
 
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
