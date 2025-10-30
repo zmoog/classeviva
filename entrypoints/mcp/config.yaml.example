@@ -1,0 +1,11 @@
+# Classeviva MCP Server Configuration
+# Place this file at ~/.classeviva/config.yaml
+
+profiles:
+  student1:
+    username: "YOUR_CLASSEVIVA_USERNAME"
+    password: "YOUR_CLASSEVIVA_PASSWORD"
+  student2:
+    username: "YOUR_CLASSEVIVA_USERNAME"  
+    password: "YOUR_CLASSEVIVA_PASSWORD"
+default_profile: "student1"
