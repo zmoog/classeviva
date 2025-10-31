@@ -1,0 +1,1515 @@
+openapi: 3.0.3
+info:
+  title: Classeviva API
+  description: |
+    Unofficial OpenAPI specification for the Classeviva school portal API (https://web.spaggiari.eu).
+    
+    This API allows students and parents to access information about grades, agenda items, 
+    noticeboards, absences, lessons, and other school-related data.
+    
+    **Note**: This is an unofficial specification based on reverse engineering and community documentation.
+    The official Classeviva API is not publicly documented by Spaggiari.
+    
+    ## Authentication
+    
+    Authentication is performed in two steps:
+    1. Call `POST /auth/login` with credentials to obtain an authentication token
+    2. Use the token in the `Z-Auth-Token` header for subsequent requests
+    
+    All requests must include these headers:
+    - `Z-Dev-Apikey`: Static API key (see security schemes)
+    - `User-Agent`: Mobile app user agent
+    - `Content-Type`: application/json
+    - `Z-Auth-Token`: Authentication token (for authenticated endpoints)
+    
+  version: 1.0.0
+  contact:
+    name: Community Documentation
+    url: https://github.com/Lioydiano/Classeviva-Official-Endpoints
+  license:
+    name: Unofficial Specification
+    
+servers:
+  - url: https://web.spaggiari.eu/rest/v1
+    description: Production API server
+
+security:
+  - ApiKeyAuth: []
+    BearerAuth: []
+
+tags:
+  - name: Authentication
+    description: User authentication and session management
+  - name: Grades
+    description: Student grades and evaluations
+  - name: Agenda
+    description: Homework, events, and assignments
+  - name: Noticeboard
+    description: School announcements and circulars
+  - name: Absences
+    description: Student absences and late arrivals
+  - name: Lessons
+    description: Lesson records and topics
+  - name: Calendar
+    description: School calendar
+  - name: Card
+    description: Student profile information
+  - name: Subjects
+    description: School subjects and teachers
+  - name: Periods
+    description: Academic periods (trimesters, semesters)
+  - name: Notes
+    description: Teacher notes and warnings
+  - name: Didactics
+    description: Teaching materials and documents
+  - name: Schoolbooks
+    description: Required textbooks and materials
+  - name: Documents
+    description: Student documents
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login to Classeviva
+      description: Authenticate a user and obtain an access token
+      operationId: login
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - uid
+                - pass
+              properties:
+                ident:
+                  type: string
+                  nullable: true
+                  description: Optional identifier (usually null)
+                uid:
+                  type: string
+                  description: Username
+                  example: student123
+                pass:
+                  type: string
+                  format: password
+                  description: Password
+                  example: mypassword
+      responses:
+        '200':
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identity'
+        '403':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/avatar:
+    get:
+      tags:
+        - Authentication
+      summary: Get user avatar
+      description: Retrieve the user's profile avatar image
+      operationId: getAvatar
+      responses:
+        '200':
+          description: Avatar image
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+
+  /auth/status:
+    get:
+      tags:
+        - Authentication
+      summary: Check authentication status
+      description: Verify if the current authentication token is valid
+      operationId: getAuthStatus
+      responses:
+        '200':
+          description: Authentication status
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /auth/ticket:
+    get:
+      tags:
+        - Authentication
+      summary: Get authentication ticket
+      description: Retrieve an authentication ticket for external services
+      operationId: getAuthTicket
+      responses:
+        '200':
+          description: Authentication ticket
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/{studentId}/grades:
+    get:
+      tags:
+        - Grades
+      summary: List student grades
+      description: Retrieve all grades for a student
+      operationId: listGrades
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: List of grades
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  grades:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Grade'
+
+  /students/{studentId}/agenda/all/{begin}/{end}:
+    get:
+      tags:
+        - Agenda
+      summary: List agenda items
+      description: Retrieve agenda items (homework, events) for a date range
+      operationId: listAgendaItems
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: begin
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: '^\d{8}$'
+            example: '20221001'
+          description: Start date in YYYYMMDD format
+        - name: end
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: '^\d{8}$'
+            example: '20221031'
+          description: End date in YYYYMMDD format
+      responses:
+        '200':
+          description: List of agenda items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agenda:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AgendaEntry'
+
+  /students/{studentId}/agenda/{eventCode}/{begin}/{end}:
+    get:
+      tags:
+        - Agenda
+      summary: List agenda items by event code
+      description: Retrieve agenda items filtered by event code for a date range
+      operationId: listAgendaItemsByCode
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: eventCode
+          in: path
+          required: true
+          schema:
+            type: string
+            example: AGHW
+          description: Event code filter (e.g., AGHW for homework)
+        - name: begin
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: '^\d{8}$'
+            example: '20221001'
+          description: Start date in YYYYMMDD format
+        - name: end
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: '^\d{8}$'
+            example: '20221031'
+          description: End date in YYYYMMDD format
+      responses:
+        '200':
+          description: List of agenda items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agenda:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AgendaEntry'
+
+  /students/{studentId}/noticeboard:
+    get:
+      tags:
+        - Noticeboard
+      summary: List noticeboard items
+      description: Retrieve school announcements and circulars
+      operationId: listNoticeboardItems
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: List of noticeboard items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Noticeboard'
+
+  /students/{studentId}/noticeboard/read/{eventCode}/{pubId}:
+    post:
+      tags:
+        - Noticeboard
+      summary: Mark noticeboard item as read
+      description: Mark a specific noticeboard item as read
+      operationId: markNoticeboardAsRead
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: eventCode
+          in: path
+          required: true
+          schema:
+            type: string
+            example: CF
+          description: Event code (typically 'CF' for circulars)
+        - name: pubId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Publication ID
+      responses:
+        '200':
+          description: Successfully marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/{studentId}/noticeboard/attach/{eventCode}/{pubId}/{attachNum}:
+    get:
+      tags:
+        - Noticeboard
+      summary: Download noticeboard attachment
+      description: Download a file attachment from a noticeboard item
+      operationId: downloadNoticeboardAttachment
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: eventCode
+          in: path
+          required: true
+          schema:
+            type: string
+            example: CF
+          description: Event code (typically 'CF' for circulars)
+        - name: pubId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Publication ID
+        - name: attachNum
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Attachment sequence number
+      responses:
+        '200':
+          description: Attachment file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /students/{studentId}/absences/details:
+    get:
+      tags:
+        - Absences
+      summary: List all absences
+      description: Retrieve all student absences and late arrivals
+      operationId: listAbsences
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: List of absences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Absence'
+
+  /students/{studentId}/absences/details/{begin}:
+    get:
+      tags:
+        - Absences
+      summary: List absences from date
+      description: Retrieve student absences from a specific date onwards
+      operationId: listAbsencesFrom
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: begin
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Start date in YYYYMMDD format
+      responses:
+        '200':
+          description: List of absences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Absence'
+
+  /students/{studentId}/absences/details/{begin}/{end}:
+    get:
+      tags:
+        - Absences
+      summary: List absences in date range
+      description: Retrieve student absences for a specific date range
+      operationId: listAbsencesRange
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: begin
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Start date in YYYYMMDD format
+        - name: end
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+          description: End date in YYYYMMDD format
+      responses:
+        '200':
+          description: List of absences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Absence'
+
+  /students/{studentId}/lessons/today:
+    get:
+      tags:
+        - Lessons
+      summary: Get today's lessons
+      description: Retrieve lessons for the current day
+      operationId: getTodayLessons
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: List of today's lessons
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lessons:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Lesson'
+
+  /students/{studentId}/lessons/{day}:
+    get:
+      tags:
+        - Lessons
+      summary: Get lessons for specific day
+      description: Retrieve lessons for a specific day
+      operationId: getLessonsByDay
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: day
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Date in YYYYMMDD format
+      responses:
+        '200':
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lessons:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Lesson'
+
+  /students/{studentId}/lessons/{start}/{end}:
+    get:
+      tags:
+        - Lessons
+      summary: Get lessons in date range
+      description: Retrieve lessons for a specific date range
+      operationId: getLessonsRange
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: start
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Start date in YYYYMMDD format
+        - name: end
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+          description: End date in YYYYMMDD format
+      responses:
+        '200':
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lessons:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Lesson'
+
+  /students/{studentId}/calendar/all:
+    get:
+      tags:
+        - Calendar
+      summary: Get school calendar
+      description: Retrieve the complete school calendar
+      operationId: getCalendar
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: School calendar
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/{studentId}/card:
+    get:
+      tags:
+        - Card
+      summary: Get student card
+      description: Retrieve student profile information
+      operationId: getStudentCard
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: Student card information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  card:
+                    $ref: '#/components/schemas/StudentCard'
+
+  /students/{studentId}/cards:
+    get:
+      tags:
+        - Card
+      summary: Get student cards
+      description: Retrieve multiple student cards (for families with multiple students)
+      operationId: getStudentCards
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: List of student cards
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/{studentId}/subjects:
+    get:
+      tags:
+        - Subjects
+      summary: List subjects
+      description: Retrieve all subjects for the student
+      operationId: listSubjects
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: List of subjects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subjects:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subject'
+
+  /students/{studentId}/periods:
+    get:
+      tags:
+        - Periods
+      summary: List academic periods
+      description: Retrieve academic periods (trimesters, semesters)
+      operationId: listPeriods
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: List of periods
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  periods:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Period'
+
+  /students/{studentId}/notes/all:
+    get:
+      tags:
+        - Notes
+      summary: List all notes
+      description: Retrieve all teacher notes and warnings
+      operationId: listNotes
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: Notes grouped by type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notes'
+
+  /students/{studentId}/notes/{type}/read/{noteId}:
+    post:
+      tags:
+        - Notes
+      summary: Mark note as read
+      description: Mark a specific note as read
+      operationId: markNoteAsRead
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [NTTE, NTCL, NTWN, NTST]
+          description: Note type
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Note ID
+      responses:
+        '200':
+          description: Successfully marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/{studentId}/didactics:
+    get:
+      tags:
+        - Didactics
+      summary: List didactic materials
+      description: Retrieve teaching materials and documents
+      operationId: listDidactics
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: List of didactic materials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  didactics:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DidacticTeacher'
+
+  /students/{studentId}/didactics/item/{contentId}:
+    get:
+      tags:
+        - Didactics
+      summary: Get didactic item
+      description: Retrieve a specific didactic item
+      operationId: getDidacticItem
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: contentId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Content ID
+      responses:
+        '200':
+          description: Didactic item details
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/{studentId}/schoolbooks:
+    get:
+      tags:
+        - Schoolbooks
+      summary: List schoolbooks
+      description: Retrieve required textbooks and materials
+      operationId: listSchoolbooks
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: List of schoolbooks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schoolbooks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SchoolbookCourse'
+
+  /students/{studentId}/documents:
+    post:
+      tags:
+        - Documents
+      summary: List documents
+      description: Retrieve student documents
+      operationId: listDocuments
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/{studentId}/documents/check/{hash}:
+    post:
+      tags:
+        - Documents
+      summary: Check document
+      description: Verify document availability
+      operationId: checkDocument
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: hash
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Document hash
+      responses:
+        '200':
+          description: Document check result
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/{studentId}/documents/read/{hash}:
+    post:
+      tags:
+        - Documents
+      summary: Read document
+      description: Mark document as read
+      operationId: readDocument
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: hash
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Document hash
+      responses:
+        '200':
+          description: Document marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Z-Dev-Apikey
+      description: "Static API key required for all requests (value: Tg1NWEwNGIgIC0K)"
+    BearerAuth:
+      type: apiKey
+      in: header
+      name: Z-Auth-Token
+      description: Authentication token obtained from login endpoint
+
+  parameters:
+    StudentId:
+      name: studentId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: The student ID (obtained from login response)
+
+  schemas:
+    Identity:
+      type: object
+      description: Authentication response containing user identity and token
+      properties:
+        ident:
+          type: string
+          description: User identifier (contains student ID with prefix/suffix)
+          example: G9123456R
+        firstName:
+          type: string
+          description: User's first name
+          example: Mario
+        lastName:
+          type: string
+          description: User's last name
+          example: Rossi
+        token:
+          type: string
+          description: Authentication token for subsequent requests
+          example: abc123token
+        release:
+          type: string
+          format: date-time
+          description: Token issue timestamp
+          example: '2022-04-27T20:29:25+02:00'
+        expire:
+          type: string
+          format: date-time
+          description: Token expiration timestamp
+          example: '2022-04-27T21:59:25+02:00'
+
+    Grade:
+      type: object
+      description: A student grade/evaluation
+      properties:
+        subjectId:
+          type: integer
+          description: Subject identifier
+          example: 206166
+        subjectCode:
+          type: string
+          description: Subject code
+        subjectDesc:
+          type: string
+          description: Subject name
+          example: MATEMATICA
+        evtId:
+          type: integer
+          description: Event identifier
+          example: 223044
+        evtCode:
+          type: string
+          description: Event code
+          example: GRV0
+        evtDate:
+          type: string
+          format: date
+          description: Grade date
+          example: '2022-04-27'
+        decimalValue:
+          type: number
+          format: float
+          description: Numeric grade value
+          example: 8.0
+        displayValue:
+          type: string
+          description: Display representation of grade
+          example: '8'
+        displaPos:
+          type: integer
+          description: Display position (Note - field name as returned by API)
+        notesForFamily:
+          type: string
+          description: Notes for family
+          example: Verifica di matematica
+        color:
+          type: string
+          description: Grade color indicator
+          enum: [green, yellow, red]
+          example: green
+        canceled:
+          type: boolean
+          description: Whether grade is canceled
+        underlined:
+          type: boolean
+          description: Whether grade is underlined
+        periodPos:
+          type: integer
+          description: Period position
+        periodDesc:
+          type: string
+          description: Period description
+          example: Trimestre
+        componentPos:
+          type: integer
+          description: Component position
+        componentDesc:
+          type: string
+          description: Component description
+          example: Scritto
+        weightFactor:
+          type: number
+          description: Grade weight factor
+        skillId:
+          type: integer
+          description: Skill identifier
+        gradeMasterId:
+          type: integer
+          description: Grade master identifier
+        skillDesc:
+          type: string
+          nullable: true
+          description: Skill description
+        skillCode:
+          type: string
+          nullable: true
+          description: Skill code
+        skillMasterId:
+          type: integer
+          description: Skill master identifier
+        skillValueDesc:
+          type: string
+          description: Skill value description
+        skillValueShortDesc:
+          type: string
+          nullable: true
+          description: Short skill value description
+        oldskillId:
+          type: integer
+          description: Old skill identifier
+        oldskillDesc:
+          type: string
+          description: Old skill description
+
+    AgendaEntry:
+      type: object
+      description: An agenda entry (homework, event, etc.)
+      properties:
+        evtId:
+          type: integer
+          description: Event identifier
+          example: 502508
+        evtCode:
+          type: string
+          description: Event code (AGHW=homework, AGNT=note, etc.)
+          example: AGHW
+        evtDatetimeBegin:
+          type: string
+          format: date-time
+          description: Event start datetime
+          example: '2022-04-04T09:00:00+02:00'
+        evtDatetimeEnd:
+          type: string
+          format: date-time
+          description: Event end datetime
+          example: '2022-04-04T10:00:00+02:00'
+        isFullDay:
+          type: boolean
+          description: Whether event spans full day
+        notes:
+          type: string
+          description: Event notes/description
+          example: Page 201 tutti gli esercizi
+        authorName:
+          type: string
+          description: Teacher/author name
+          example: PESANDO MARGHERITA
+        classDesc:
+          type: string
+          description: Class description
+          example: 2E MUSICALE
+        subjectId:
+          type: integer
+          description: Subject identifier
+          example: 396137
+        subjectDesc:
+          type: string
+          description: Subject name
+          example: INGLESE
+        homeworkId:
+          type: integer
+          nullable: true
+          description: Homework identifier
+
+    Noticeboard:
+      type: object
+      description: A noticeboard item (announcement, circular)
+      properties:
+        pubId:
+          type: integer
+          description: Publication identifier
+          example: 18020281
+        pubDT:
+          type: string
+          format: date-time
+          description: Publication datetime
+          example: '2022-04-28T10:30:00+02:00'
+        readStatus:
+          type: boolean
+          description: Whether item has been read
+        evtCode:
+          type: string
+          description: Event code
+          example: CF
+        cntId:
+          type: integer
+          description: Content identifier
+        cntValidFrom:
+          type: string
+          format: date
+          description: Valid from date
+        cntValidTo:
+          type: string
+          format: date
+          description: Valid to date
+        cntValidInRange:
+          type: boolean
+          description: Whether currently valid
+        cntStatus:
+          type: string
+          description: Content status
+          example: active
+        cntTitle:
+          type: string
+          description: Title
+          example: Comunicazione assemblea di istituto
+        cntCategory:
+          type: string
+          description: Category
+          example: Circolare
+        cntHasChanged:
+          type: boolean
+          description: Whether content has changed
+        cntHasAttach:
+          type: boolean
+          description: Whether has attachments
+        needJoin:
+          type: boolean
+          description: Whether requires join action
+        needReply:
+          type: boolean
+          description: Whether requires reply
+        needFile:
+          type: boolean
+          description: Whether requires file upload
+        needSign:
+          type: boolean
+          description: Whether requires signature
+        evento_id:
+          type: string
+          description: Event identifier
+        dinsert_allegato:
+          type: string
+          format: date-time
+          description: Attachment insert datetime
+        attachments:
+          type: array
+          description: List of attachments
+          items:
+            type: object
+            properties:
+              fileName:
+                type: string
+                description: Attachment file name
+              attachNum:
+                type: integer
+                description: Attachment sequence number
+
+    Absence:
+      type: object
+      description: An absence or late arrival event
+      properties:
+        evtId:
+          type: integer
+          description: Event identifier
+          example: 1065236
+        evtCode:
+          type: string
+          description: Event code (ABR1=late, ABA0=absence, ABU0=hourly absence)
+          example: ABR1
+        evtDate:
+          type: string
+          format: date
+          description: Event date
+          example: '2022-01-15'
+        evtHPos:
+          type: integer
+          nullable: true
+          description: Hour position (for hourly absences)
+        evtValue:
+          type: integer
+          nullable: true
+          description: Event value
+        isJustified:
+          type: boolean
+          description: Whether justified
+        justifReasonCode:
+          type: string
+          description: Justification reason code
+        justifReasonDesc:
+          type: string
+          description: Justification reason description
+          example: Motivi di salute
+        hoursAbsence:
+          type: array
+          description: Hours of absence detail
+          items:
+            type: object
+            properties:
+              hPos:
+                type: integer
+                description: Hour position
+              subject:
+                type: string
+                description: Subject name
+
+    Lesson:
+      type: object
+      description: A lesson record
+      properties:
+        evtId:
+          type: integer
+          description: Event identifier
+          example: 298438
+        evtDate:
+          type: string
+          format: date
+          description: Lesson date
+          example: '2022-04-15'
+        evtCode:
+          type: string
+          description: Event code
+          example: LSF0
+        evtHPos:
+          type: integer
+          description: Hour position
+          example: 1
+        evtDuration:
+          type: integer
+          description: Duration in hours
+          example: 1
+        classDesc:
+          type: string
+          description: Class description
+        authorName:
+          type: string
+          description: Teacher name
+          example: ROSSI MARIO
+        subjectId:
+          type: integer
+          description: Subject identifier
+        subjectCode:
+          type: string
+          nullable: true
+          description: Subject code
+        subjectDesc:
+          type: string
+          description: Subject name
+          example: FISICA
+        lessonType:
+          type: string
+          description: Lesson type
+          example: Lezione
+        lessonArg:
+          type: string
+          description: Lesson topic/argument
+          example: Punto materiale, traiettoria, sistemi di riferimento
+
+    StudentCard:
+      type: object
+      description: Student profile card
+      properties:
+        ident:
+          type: string
+          description: Student identifier
+          example: S8733880I
+        usrType:
+          type: string
+          description: User type
+          example: S
+        usrId:
+          type: integer
+          description: User ID
+          example: 8733880
+        miurSchoolCode:
+          type: string
+          description: MIUR school code
+        miurDivisionCode:
+          type: string
+          description: MIUR division code
+        firstName:
+          type: string
+          description: First name
+          example: Mario
+        lastName:
+          type: string
+          description: Last name
+          example: Rossi
+        birthDate:
+          type: string
+          format: date
+          description: Birth date
+        fiscalCode:
+          type: string
+          description: Fiscal code
+          example: RSSMRA05T01H501Z
+        schCode:
+          type: string
+          description: School code
+        schName:
+          type: string
+          description: School name
+        schDedication:
+          type: string
+          description: School dedication
+        schCity:
+          type: string
+          description: School city
+        schProv:
+          type: string
+          description: School province
+
+    Subject:
+      type: object
+      description: A school subject
+      properties:
+        id:
+          type: integer
+          description: Subject identifier
+          example: 217039
+        description:
+          type: string
+          description: Subject name
+          example: STORIA
+        order:
+          type: integer
+          description: Display order
+          example: 19
+        teachers:
+          type: array
+          description: Subject teachers
+          items:
+            type: object
+            properties:
+              teacherId:
+                type: string
+                description: Teacher identifier
+              teacherName:
+                type: string
+                description: Teacher name
+                example: ROSSI MARIO
+
+    Period:
+      type: object
+      description: An academic period
+      properties:
+        periodCode:
+          type: string
+          description: Period code
+          example: Q1
+        periodPos:
+          type: integer
+          description: Period position
+          example: 1
+        periodDesc:
+          type: string
+          description: Period description
+          example: Trimestre
+        isFinal:
+          type: boolean
+          description: Whether this is the final period
+        dateStart:
+          type: string
+          format: date
+          description: Start date
+          example: '2022-09-11'
+        dateEnd:
+          type: string
+          format: date
+          description: End date
+          example: '2022-12-23'
+        miurDivisionCode:
+          type: string
+          nullable: true
+          description: MIUR division code
+
+    Note:
+      type: object
+      description: A teacher note
+      properties:
+        evtId:
+          type: integer
+          description: Event identifier
+        evtText:
+          type: string
+          description: Note text
+        evtDate:
+          type: string
+          format: date
+          description: Note date
+        authorName:
+          type: string
+          description: Author name
+        readStatus:
+          type: boolean
+          description: Read status
+        warningType:
+          type: string
+          description: Warning type (for warning notes)
+
+    Notes:
+      type: object
+      description: Notes grouped by type
+      properties:
+        NTTE:
+          type: array
+          description: Teacher notes (Note del docente)
+          items:
+            $ref: '#/components/schemas/Note'
+        NTCL:
+          type: array
+          description: Class notes (Note della classe)
+          items:
+            $ref: '#/components/schemas/Note'
+        NTWN:
+          type: array
+          description: Warning notes (Richiami)
+          items:
+            $ref: '#/components/schemas/Note'
+        NTST:
+          type: array
+          description: Sanction notes (Sanzioni)
+          items:
+            $ref: '#/components/schemas/Note'
+
+    DidacticTeacher:
+      type: object
+      description: Didactic materials by teacher
+      properties:
+        teacherId:
+          type: string
+          description: Teacher identifier
+        teacherName:
+          type: string
+          description: Teacher full name
+        teacherFirstName:
+          type: string
+          description: Teacher first name
+        teacherLastName:
+          type: string
+          description: Teacher last name
+        folders:
+          type: array
+          description: Folders containing materials
+          items:
+            type: object
+            properties:
+              folderId:
+                type: integer
+                description: Folder identifier
+              folderName:
+                type: string
+                description: Folder name
+              lastShareDT:
+                type: string
+                format: date-time
+                description: Last share datetime
+              contents:
+                type: array
+                description: Folder contents
+                items:
+                  type: object
+                  properties:
+                    contentId:
+                      type: integer
+                      description: Content identifier
+                    contentName:
+                      type: string
+                      description: Content name
+                    objectId:
+                      type: integer
+                      description: Object identifier
+                    objectType:
+                      type: string
+                      description: Object type
+                      example: file
+                    shareDT:
+                      type: string
+                      format: date-time
+                      description: Share datetime
+
+    SchoolbookCourse:
+      type: object
+      description: Schoolbooks for a course
+      properties:
+        courseId:
+          type: integer
+          description: Course identifier
+        courseDesc:
+          type: string
+          description: Course description
+        books:
+          type: array
+          description: List of books
+          items:
+            $ref: '#/components/schemas/Schoolbook'
+
+    Schoolbook:
+      type: object
+      description: A required textbook
+      properties:
+        bookId:
+          type: integer
+          description: Book identifier
+        isbnCode:
+          type: string
+          description: ISBN code
+          example: '9788808937735'
+        title:
+          type: string
+          description: Book title
+        subheading:
+          type: string
+          nullable: true
+          description: Book subheading
+        volume:
+          type: string
+          description: Volume number
+        author:
+          type: string
+          description: Author name
+        publisher:
+          type: string
+          description: Publisher name
+        subjectDesc:
+          type: string
+          description: Subject name
+        price:
+          type: number
+          format: float
+          description: Book price
+        toBuy:
+          type: boolean
+          description: Whether needs to be bought
+        newAdoption:
+          type: boolean
+          description: Whether this is a new adoption
+        alreadyOwned:
+          type: boolean
+          description: Whether already owned
+        alreadyInUse:
+          type: boolean
+          description: Whether already in use
+        recommended:
+          type: boolean
+          description: Whether recommended
+        recommendedFor:
+          type: string
+          nullable: true
+          description: Recommended for
+        coverUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: Cover image URL
+        publisherUnlockCode:
+          type: string
+          description: Publisher unlock code
+
+    Error:
+      type: object
+      description: Error response
+      properties:
+        error:
+          type: string
+          description: Error message
+        statusCode:
+          type: integer
+          description: HTTP status code
