@@ -11,7 +11,7 @@ require (
 	github.com/knadh/koanf/v2 v2.3.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.10.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
