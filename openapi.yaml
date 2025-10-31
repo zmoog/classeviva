@@ -698,7 +698,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  didacticts:
+                  didactics:
                     type: array
                     items:
                       $ref: '#/components/schemas/DidacticTeacher'
@@ -904,7 +904,7 @@ components:
           example: '8'
         displaPos:
           type: integer
-          description: Display position
+          description: Display position (Note - field name as returned by API)
         notesForFamily:
           type: string
           description: Notes for family
