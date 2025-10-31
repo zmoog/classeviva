@@ -4,10 +4,12 @@ Classeviva is a Go library and CLI tool to access the popular school portal http
 
 ## OpenAPI Specification
 
+📖 **[View Interactive API Documentation](https://zmoog.github.io/classeviva/)**
+
 An [OpenAPI specification](openapi.yaml) is available that documents the Classeviva API endpoints. This specification can be used to:
 
+- **View interactive API documentation** - Automatically published to [GitHub Pages](https://zmoog.github.io/classeviva/)
 - **Generate API clients** in your preferred programming language using tools like [OpenAPI Generator](https://openapi-generator.tech/)
-- **View interactive API documentation** using tools like [Swagger UI](https://swagger.io/tools/swagger-ui/) or [Redoc](https://redocly.github.io/redoc/)
 - **Understand API endpoints** and request/response formats
 
 The specification is based on the unofficial community documentation at [Classeviva-Official-Endpoints](https://github.com/Lioydiano/Classeviva-Official-Endpoints).

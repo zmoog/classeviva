@@ -12,7 +12,12 @@ The `openapi.yaml` file is a machine-readable API specification that describes a
 
 ### 1. View Interactive Documentation
 
-You can use various tools to view the API documentation interactively:
+#### Online (GitHub Pages)
+The API documentation is automatically published to GitHub Pages:
+
+🔗 **https://zmoog.github.io/classeviva/**
+
+This is updated automatically whenever the `openapi.yaml` file is changed on the `main` branch.
 
 #### Using Swagger UI Online
 1. Go to https://editor.swagger.io/
@@ -20,7 +25,7 @@ You can use various tools to view the API documentation interactively:
 3. Upload the `openapi.yaml` file
 4. Browse the interactive documentation
 
-#### Using Redoc
+#### Using Redoc Locally
 ```bash
 npx @redocly/cli preview-docs openapi.yaml
 ```
