@@ -12,13 +12,6 @@ The `openapi.yaml` file is a machine-readable API specification that describes a
 
 ### 1. View Interactive Documentation
 
-#### Online (GitHub Pages)
-The API documentation is automatically published to GitHub Pages:
-
-🔗 **https://zmoog.github.io/classeviva/**
-
-This is updated automatically whenever the `openapi.yaml` file is changed on the `main` branch.
-
 #### Using Swagger UI Online
 1. Go to https://editor.swagger.io/
 2. Click "File" → "Import File"
