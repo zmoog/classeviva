@@ -2,7 +2,9 @@
 
 Classeviva is a Go library and CLI tool to access the popular school portal https://web.spaggiari.eu.
 
-## Install
+## Quick Start
+
+### Install
 
 ```sh
 brew install zmoog/homebrew-classeviva/classeviva
@@ -22,6 +24,33 @@ classeviva
 
 ==> Artifacts
 classeviva (Binary)
+```
+
+### Add your kids
+
+```sh
+$ classeviva profile add joelmiller
+Username: joelmiller
+Password: ******
+Profile 'joelmiller' added successfully.
+```
+
+```sh
+$ classeviva profile list
++------------+------------+---------+
+| PROFILE    | USERNAME   | DEFAULT |
++------------+------------+---------+
+| joelmiller | joelmiller | *       |
++------------+------------+---------+
+
+$ classeviva grades list
++------------+-------+-----------------------------------------------------------+----------------------------------+
+| DATE       | GRADE | SUBJECT                                                   | NOTES                            |
++------------+-------+-----------------------------------------------------------+----------------------------------+
+| 2025-10-24 | 9     | SCIENZE MOTORIE E SPORTIVE                                |                                  |
+|            | 7-    | STORIA                                                    |                                  |
+| 2025-10-22 | 8½    | SCIENZE NATURALI (BIOLOGIA, CHIMICA, SCIENZE DELLA TERRA) | Verifiche genetica moderna e DNA |
++------------+-------+-----------------------------------------------------------+----------------------------------+%     
 ```
 
 ## Authentication
