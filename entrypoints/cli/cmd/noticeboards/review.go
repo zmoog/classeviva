@@ -19,11 +19,13 @@ attachments, or complete actions. Workflow flags are not verified pending tasks,
 and publication expiry is not necessarily an action deadline.
 
 Flagged notices remain visible even when read, expired, or missing an expiry date.
+Use --unread to exclude all read notices, including those with workflow flags.
 Dates are compared in Europe/Rome. Results show the reasons for inclusion.`,
 		Args: cobra.NoArgs,
 		RunE: runReviewCommand,
 	}
 	cmd.Flags().Int("days", 7, "Calendar days ahead for unread expiry signals (0 means today only)")
+	cmd.Flags().Bool("unread", false, "Only include unread notices, excluding read notices even when workflow flags are set")
 	return cmd
 }
 
@@ -34,6 +36,10 @@ func runReviewCommand(cmd *cobra.Command, args []string) error {
 	}
 	if days < 0 {
 		return fmt.Errorf("days must be zero or greater")
+	}
+	unreadOnly, err := cmd.Flags().GetBool("unread")
+	if err != nil {
+		return err
 	}
 	profile, _ := cmd.Flags().GetString("profile")
 	username, _ := cmd.Flags().GetString("username")
@@ -46,5 +52,5 @@ func runReviewCommand(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	return runner.Run(commands.ReviewNoticeboardsCommand{Days: days})
+	return runner.Run(commands.ReviewNoticeboardsCommand{Days: days, UnreadOnly: unreadOnly})
 }

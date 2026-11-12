@@ -10,7 +10,8 @@ import (
 )
 
 type ReviewNoticeboardsCommand struct {
-	Days int
+	Days       int
+	UnreadOnly bool
 }
 
 func (c ReviewNoticeboardsCommand) ExecuteWith(uow UnitOfWork) error {
@@ -24,6 +25,15 @@ func (c ReviewNoticeboardsCommand) ExecuteWith(uow UnitOfWork) error {
 	items, err := ReviewNoticeboards(notices, time.Now(), c.Days)
 	if err != nil {
 		return err
+	}
+	if c.UnreadOnly {
+		unread := make([]ReviewedNoticeboard, 0, len(items))
+		for _, item := range items {
+			if !item.Notice.Read {
+				unread = append(unread, item)
+			}
+		}
+		items = unread
 	}
 	return feedback.PrintResult(NoticeboardsReviewResult{Items: items})
 }

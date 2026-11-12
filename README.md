@@ -325,11 +325,16 @@ classeviva noticeboards review
 classeviva --profile older-kid noticeboards review --days 14
 classeviva noticeboards review --days 14 --format json
 
+# Exclude read notices, even those with workflow flags
+classeviva noticeboards review --days 14 --unread
+
 # Today only for the unread-expiry signal; workflow flags are still included
 classeviva noticeboards review --days 0
 ```
 
-A notice is included when **any `needJoin`, `needReply`, `needFile`, or `needSign` flag is true**, **or** when it is unread and `cntValidTo` falls between today and today + `--days`, inclusive. The default is 7 days; negative values are rejected. Date comparisons use `Europe/Rome` calendar dates, including across daylight-saving transitions.
+By default, a notice is included when **any `needJoin`, `needReply`, `needFile`, or `needSign` flag is true**, **or** when it is unread and `cntValidTo` falls between today and today + `--days`, inclusive. The default is 7 days; negative values are rejected. Date comparisons use `Europe/Rome` calendar dates, including across daylight-saving transitions.
+
+`--unread` narrows the review queue to unread notices only, overriding the default inclusion of read notices with workflow flags. It does not include every unread notice: the workflow-or-approaching-expiry criteria still apply. It is disabled by default and works with both text and JSON output.
 
 Notices matching both signals come first, followed by other workflow-flagged notices, then notices matching only unread expiry. Within each group, earliest expiry comes first, unknown expiry last, and ties preserve server order.
 

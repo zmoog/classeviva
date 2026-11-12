@@ -108,6 +108,46 @@ func TestReviewNoticeboardsCommandIsReadOnly(t *testing.T) {
 	assert.Empty(t, stderr.String())
 }
 
+func TestReviewNoticeboardsCommandUnreadFilter(t *testing.T) {
+	cases := []struct {
+		name       string
+		unreadOnly bool
+		unreadFlag bool
+		wantIDs    []int
+	}{
+		{"default retains read workflow flags", false, true, []int{1, 2}},
+		{"unread excludes read workflow flags", true, true, []int{2}},
+		{"unread does not bypass review criteria", true, false, []int{}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			notices := []spaggiari.Noticeboard{
+				{ID: 1, Read: true, NeedSign: true},
+				{ID: 2, Read: false, NeedReply: tc.unreadFlag},
+			}
+			original := append([]spaggiari.Noticeboard(nil), notices...)
+			var stdout, stderr bytes.Buffer
+			feedback.SetDefault(feedback.New(&stdout, &stderr, feedback.JSON))
+			t.Cleanup(func() { feedback.SetDefault(feedback.Default()) })
+			adapter := spaggiari.Adapter{Noticeboards: reviewNoticeboardsReceiver{items: notices}}
+			err := (commands.ReviewNoticeboardsCommand{Days: 14, UnreadOnly: tc.unreadOnly}).ExecuteWith(commands.UnitOfWork{Adapter: adapter})
+			require.NoError(t, err)
+			var items []commands.ReviewedNoticeboard
+			require.NoError(t, json.Unmarshal(stdout.Bytes(), &items))
+			ids := make([]int, 0, len(items))
+			for _, item := range items {
+				ids = append(ids, item.Notice.ID)
+			}
+			assert.Equal(t, tc.wantIDs, ids)
+			if len(tc.wantIDs) == 0 {
+				assert.JSONEq(t, "[]", stdout.String())
+			}
+			assert.Equal(t, original, notices, "filtering must not modify the fetched notices")
+			assert.Empty(t, stderr.String())
+		})
+	}
+}
+
 func TestReviewNoticeboardsCommandErrors(t *testing.T) {
 	want := errors.New("synthetic API failure")
 	adapter := spaggiari.Adapter{Noticeboards: reviewNoticeboardsReceiver{err: want}}
