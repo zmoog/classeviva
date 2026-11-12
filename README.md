@@ -40,6 +40,8 @@ classeviva (Binary)
 
 ### Add your kids
 
+Configure credentials in a private local terminal, not an agent transcript. **The current `profile add` prompt echoes input**; asterisks below are documentation redaction, not password masking. Use the [safe profile-setup procedure](.agents/skills/classeviva-cli/references/secrets.md#human-only-profile-setup) to enter credentials without echoing them or putting them in command arguments.
+
 ```sh
 $ classeviva profile add joelmiller
 Username: joelmiller
@@ -67,7 +69,7 @@ $ classeviva grades list
 
 ## Authentication
 
-Classeviva supports multiple authentication methods with a priority chain, making it easy to manage credentials for multiple students.
+Classeviva supports multiple authentication methods with a priority chain, making it easy to manage credentials for multiple students. Read the [credential and private-data safety guide](.agents/skills/classeviva-cli/references/secrets.md) before setup or agent use. Profiles store plaintext passwords, identity caches contain authentication tokens, and `--debug` can expose authentication responses.
 
 ### Authentication Priority
 
@@ -83,7 +85,7 @@ For families with multiple students, profile-based authentication is the recomme
 
 #### Setup Profiles
 
-Add profiles for each student:
+For private credential entry, follow the [human-only profile setup](.agents/skills/classeviva-cli/references/secrets.md#human-only-profile-setup). The examples below illustrate the flow with redacted passwords:
 
 ```shell
 # Add first student profile
@@ -118,7 +120,7 @@ younger-kid
 
 #### Show Profile Details
 
-Display profile information (credentials are hidden):
+Display profile information (the password is masked; the username is displayed):
 
 ```shell
 $ classeviva profile show older-kid
@@ -145,10 +147,9 @@ $ classeviva grades list --limit 10
 
 # Use specific profile
 $ classeviva --profile younger-kid grades list --limit 10
-
-# Override with CLI flags (highest priority)
-$ classeviva --username user --password pass grades list
 ```
+
+Credential flags are supported, but avoid passing real passwords in arguments: they can appear in process listings, shell history, and agent logs. Prefer an existing profile or trusted secret-manager injection as described in the [safety guide](.agents/skills/classeviva-cli/references/secrets.md).
 
 ### Configuration File
 
@@ -165,21 +166,28 @@ profiles:
 default_profile: "older-kid"
 ```
 
-**Note**: The config file has restrictive permissions (0600) to protect credentials.
+**Note**: New config files are created with restrictive permissions (0600), but passwords are not encrypted. Existing file permissions may need tightening; see the [safety guide](.agents/skills/classeviva-cli/references/secrets.md#storage-and-current-limitations).
 
 ### Environment Variables (Legacy)
 
-For backward compatibility, you can still use environment variables:
+For backward compatibility, a trusted launcher or secret manager can inject `CLASSEVIVA_USERNAME` and `CLASSEVIVA_PASSWORD`. Avoid literal `export` commands containing real secrets, and remember that a selected/default profile takes precedence over these variables. The CLI does not automatically load `.env` files. See [environment-only automation](.agents/skills/classeviva-cli/references/secrets.md#environment-only-automation) for isolated token-cache handling.
 
 ```shell
-export CLASSEVIVA_USERNAME="your_username"
-export CLASSEVIVA_PASSWORD="your_password"
-$ classeviva grades list
+# Both credential variables have already been injected privately
+classeviva grades list
 ```
 
 ### Identity Caching
 
 Authentication tokens are cached per-profile in `~/.classeviva/identity-{profile}.json` to minimize API calls. Tokens are automatically refreshed when expired.
+
+## Agent skill
+
+The portable [Classeviva CLI skill](.agents/skills/classeviva-cli/SKILL.md) lives in `.agents/skills/classeviva-cli/`. It covers grades, agenda, notice review, profile selection, and the authorization required before downloading attachments (which marks notices read).
+
+Agents supporting the project `.agents/skills/` convention can discover it after reload/restart. For other agents, load `SKILL.md` explicitly or copy the entire `classeviva-cli` directory, including `references/`, into a supported skills location. In Pi, it can be invoked as `/skill:classeviva-cli`. Loading a skill does not configure credentials or grant permission to change school data.
+
+The bundled [credential and private-data safety guide](.agents/skills/classeviva-cli/references/secrets.md) documents plaintext storage, private human setup, environment injection, token caches, debug-log risks, and incident handling. **The API blocks requests originating from cloud service providers (CSPs)**; hosted agents and CI runners can receive HTTP 403 with valid credentials. Run authenticated operations from an authorized local machine or approved non-CSP network; see [network restrictions](.agents/skills/classeviva-cli/references/secrets.md#network-restrictions-and-http-403).
 
 ## CLI Commands
 
@@ -313,6 +321,39 @@ $ classeviva noticeboards list --format json
   }
 ]
 ```
+
+#### Review notices
+
+Surface notices worth reviewing without changing their read status:
+
+```shell
+# Default: unread notices expiring within 7 days, plus any workflow-flagged notices
+classeviva noticeboards review
+
+classeviva --profile older-kid noticeboards review --days 14
+classeviva noticeboards review --days 14 --format json
+
+# Exclude read notices, even those with workflow flags
+classeviva noticeboards review --days 14 --unread
+
+# Today only for the unread-expiry signal; workflow flags are still included
+classeviva noticeboards review --days 0
+```
+
+By default, a notice is included when **any `needJoin`, `needReply`, `needFile`, or `needSign` flag is true**, **or** when it is unread and `cntValidTo` falls between today and today + `--days`, inclusive. The default is 7 days; negative values are rejected. Date comparisons use `Europe/Rome` calendar dates, including across daylight-saving transitions.
+
+`--unread` narrows the review queue to unread notices only, overriding the default inclusion of read notices with workflow flags. It does not include every unread notice: the workflow-or-approaching-expiry criteria still apply. It is disabled by default and works with both text and JSON output.
+
+Notices matching both signals come first, followed by other workflow-flagged notices, then notices matching only unread expiry. Within each group, earliest expiry comes first, unknown expiry last, and ties preserve server order.
+
+The text view shows publication ID, website notice number, read status, validity end date, attention reasons, and title. Reasons say “Signature flag set” rather than claiming a signature is still pending. Expired flagged notices remain visible as **expired**, not “overdue”; flagged notices with missing or malformed expiry dates show **Unknown**. Unread notices with expired, missing, or malformed expiry dates are not included unless a workflow flag is set.
+
+JSON output is an array of objects containing the original notice under `notice` and derived signals under `attention`:
+
+- `attention.reasons`: `participation_flag`, `reply_flag`, `file_submission_flag`, `signature_flag`, `unread`, and/or `expires_soon`.
+- `attention.days_until_expiry`: calendar days remaining, negative for expired notices, or `null` for unknown expiry.
+
+This is a **heuristic review queue**, not a definitive task list: all-false workflow flags do not prove no work is required, reading does not mean completion, and publication expiry may differ from an action deadline in the content. The command only lists notices; it does not mark them read, download attachments, or perform actions. `noticeboards list` retains its existing behavior and output shape.
 
 Download noticeboard attachments:
 

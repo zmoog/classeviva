@@ -1,0 +1,53 @@
+{
+  "items": [
+    {
+      "pubId": 1001,
+      "pubDT": "2026-11-11T13:44:09+01:00",
+      "readStatus": true,
+      "evtCode": "CF",
+      "cntId": 501,
+      "cntValidFrom": "2026-11-11",
+      "cntValidTo": "2027-02-28",
+      "cntValidInRange": true,
+      "cntStatus": "active",
+      "cntNum": "007",
+      "cntTitle": "Synthetic notice: hypothetical workflow flags, not observed production behavior",
+      "cntCategory": "Circolare",
+      "cntHasChanged": true,
+      "cntHasAttach": true,
+      "needJoin": true,
+      "needReply": true,
+      "needFile": true,
+      "needSign": true,
+      "evento_id": "501",
+      "dinsert_allegato": "2026-11-11 13:43:59",
+      "attachments": [
+        {"fileName": "synthetic-information.pdf", "attachNum": 1},
+        {"fileName": "synthetic-form.docx", "attachNum": 2}
+      ]
+    },
+    {
+      "pubId": 1002,
+      "pubDT": "2026-09-01T10:34:21+02:00",
+      "readStatus": false,
+      "evtCode": "CF",
+      "cntId": 502,
+      "cntValidFrom": "2026-09-01",
+      "cntValidTo": "2026-09-03",
+      "cntValidInRange": false,
+      "cntStatus": "active",
+      "cntNum": "1",
+      "cntTitle": "Synthetic expired notice, still active and without attachments",
+      "cntCategory": "",
+      "cntHasChanged": false,
+      "cntHasAttach": false,
+      "needJoin": false,
+      "needReply": false,
+      "needFile": false,
+      "needSign": false,
+      "evento_id": "502",
+      "dinsert_allegato": "2026-09-01 10:34:21",
+      "attachments": []
+    }
+  ]
+}

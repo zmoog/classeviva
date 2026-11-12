@@ -40,11 +40,24 @@ type Noticeboard struct {
 	Read            bool   `json:"readStatus"`
 	PublicationDate string `json:"pubDT"`
 	EventCode       string `json:"evtCode"`
+	ContentID       int    `json:"cntId"`
+	Number          string `json:"cntNum"`       // Website notice number, not the circular number in Title.
+	ValidFrom       string `json:"cntValidFrom"` // Date only (YYYY-MM-DD).
+	ValidTo         string `json:"cntValidTo"`   // Publication expiry date, not necessarily an action deadline.
 	Valid           bool   `json:"cntValidInRange"`
-	Status          string `json:"cntStatus"`
+	Status          string `json:"cntStatus"` // An active notice can still be expired.
 	Category        string `json:"cntCategory"`
+	HasChanged      bool   `json:"cntHasChanged"`
 	HasAttachments  bool   `json:"cntHasAttach"`
-	Attachments     []struct {
+	// Likely workflow requirements; exact action-state semantics are unverified.
+	NeedJoin  bool   `json:"needJoin"`
+	NeedReply bool   `json:"needReply"`
+	NeedFile  bool   `json:"needFile"`
+	NeedSign  bool   `json:"needSign"`
+	EventID   string `json:"evento_id"` // Matches ContentID as a string in the observed CF notices.
+	// Raw YYYY-MM-DD HH:MM:SS value; timezone and exact provenance are unverified.
+	InsertedAt  string `json:"dinsert_allegato"`
+	Attachments []struct {
 		Name   string `json:"fileName"`
 		Number int    `json:"attachNum"`
 	} `json:"attachments"`

@@ -1040,21 +1040,25 @@ components:
           example: CF
         cntId:
           type: integer
-          description: Content identifier
+          description: Content identifier, distinct from the publication identifier
+        cntNum:
+          type: string
+          description: Website notice number, not necessarily the circular number in the title
+          example: '302'
         cntValidFrom:
           type: string
           format: date
-          description: Valid from date
+          description: Publication validity start date, without a time or timezone
         cntValidTo:
           type: string
           format: date
-          description: Valid to date
+          description: Publication expiry date displayed as Deadline, not necessarily an action deadline; no time or timezone
         cntValidInRange:
           type: boolean
           description: Whether currently valid
         cntStatus:
           type: string
-          description: Content status
+          description: Content status; active notices can still be outside their validity date range
           example: active
         cntTitle:
           type: string
@@ -1066,29 +1070,30 @@ components:
           example: Circolare
         cntHasChanged:
           type: boolean
-          description: Whether content has changed
+          description: Likely indicates changed content; exact change-tracking semantics are unverified
         cntHasAttach:
           type: boolean
           description: Whether has attachments
         needJoin:
           type: boolean
-          description: Whether requires join action
+          description: Likely a portal participation or adhesion workflow flag; exact action-state semantics are unverified
         needReply:
           type: boolean
-          description: Whether requires reply
+          description: Likely a portal reply workflow flag; exact action-state semantics are unverified
         needFile:
           type: boolean
-          description: Whether requires file upload
+          description: Likely a portal file-submission workflow flag; exact action-state semantics are unverified
         needSign:
           type: boolean
-          description: Whether requires signature
+          description: Likely a portal signature or acknowledgment workflow flag; exact action-state semantics are unverified
         evento_id:
           type: string
-          description: Event identifier
+          description: Event identifier; equals the string representation of cntId in observed CF notices, not guaranteed for other cases
         dinsert_allegato:
           type: string
-          format: date-time
-          description: Attachment insert datetime
+          pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$'
+          description: Raw insertion timestamp without an offset; exact provenance and timezone are unverified, and the value can exist without attachments
+          example: '2026-11-11 13:43:59'
         attachments:
           type: array
           description: List of attachments
