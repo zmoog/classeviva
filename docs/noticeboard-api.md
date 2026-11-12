@@ -1,6 +1,6 @@
 # Noticeboard fields and semantic investigation
 
-Implementation and follow-up research for [issue #100](https://github.com/zmoog/classeviva/issues/100), including the [timezone and workflow investigation request](https://github.com/zmoog/classeviva/issues/100#issuecomment-6821039056).
+Field-preservation implementation, review command, and follow-up research for [issue #100](https://github.com/zmoog/classeviva/issues/100), including the [timezone and workflow investigation request](https://github.com/zmoog/classeviva/issues/100#issuecomment-6821039056).
 
 ## Sources and method
 
@@ -15,7 +15,7 @@ Raw responses, documents, and extracted text were kept outside the repository an
 
 ## Fields preserved by the client
 
-`spaggiari.Noticeboard` now preserves all 21 top-level fields observed in both snapshots, plus both nested attachment fields. Existing JSON keys and types remain unchanged; the new properties are additive. The text table is unchanged.
+`spaggiari.Noticeboard` now preserves all 21 top-level fields observed in both snapshots, plus both nested attachment fields. Existing JSON keys and types remain unchanged; the new properties are additive. The existing `list` text table is unchanged; `review` provides a separate attention-oriented view.
 
 | Newly captured Go field | JSON key | Wire type / interpretation |
 | --- | --- | --- |
@@ -74,3 +74,13 @@ All 28 expired notices in the refreshed response still have `cntStatus: "active"
 - Workflow, expiry, identifier, and timezone descriptions distinguish observations from hypotheses.
 - `adapters/spaggiari/testdata/noticeboards.json` covers both explicit publication offsets, date-only validity values, a leading-zero string notice number, distinct publication/content IDs, hypothetical true flags, false flags, an expired-but-active notice, an empty category, and empty/nonempty attachment arrays.
 - Regression tests check typed field access, complete JSON decode/re-encode preservation, and JSON result output through the existing formatter. No production API access is needed to run them.
+
+## Read-only review command
+
+`classeviva noticeboards review --days 14` combines the two independent signals: any workflow flag, or an unread notice with a validity end date from today through 14 calendar days ahead (inclusive). The default window is 7 days, and zero means today only. It does not change `noticeboards list`.
+
+The `commands.ReviewNoticeboards` function accepts the reference time explicitly, calculates Europe/Rome calendar dates, and returns selected notices with their reasons and nullable days until expiry. It does not alter input data. Missing or malformed expiry values do not suppress a workflow flag. Combined signals sort before flags alone, then unread expiry alone; expiry sorts ascending within each group, with unknown dates last and stable ties.
+
+The result formatter keeps the notice and derived attention data separate in JSON. Text labels are deliberately conservative: workflow flags are “set,” not “pending,” and expired publication validity is not called an overdue task. No read-marking, download, or action endpoint is invoked. In line with the caveats above, this is a prioritization heuristic rather than an exhaustive task detector.
+
+Tests cover independent signals, all workflow flags, window boundaries, zero/negative windows, invalid/missing expiry, read and expired flagged notices, stable sorting, winter/summer local midnight, both DST transitions, empty output, JSON field preservation, and argument validation. A synthetic HTTP-transport test exercises profile selection through the Cobra command and allows only a single notice-list GET, rejecting any unexpected operation. See the README for usage and JSON reason codes.

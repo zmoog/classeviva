@@ -314,6 +314,34 @@ $ classeviva noticeboards list --format json
 ]
 ```
 
+#### Review notices
+
+Surface notices worth reviewing without changing their read status:
+
+```shell
+# Default: unread notices expiring within 7 days, plus any workflow-flagged notices
+classeviva noticeboards review
+
+classeviva --profile older-kid noticeboards review --days 14
+classeviva noticeboards review --days 14 --format json
+
+# Today only for the unread-expiry signal; workflow flags are still included
+classeviva noticeboards review --days 0
+```
+
+A notice is included when **any `needJoin`, `needReply`, `needFile`, or `needSign` flag is true**, **or** when it is unread and `cntValidTo` falls between today and today + `--days`, inclusive. The default is 7 days; negative values are rejected. Date comparisons use `Europe/Rome` calendar dates, including across daylight-saving transitions.
+
+Notices matching both signals come first, followed by other workflow-flagged notices, then notices matching only unread expiry. Within each group, earliest expiry comes first, unknown expiry last, and ties preserve server order.
+
+The text view shows publication ID, website notice number, read status, validity end date, attention reasons, and title. Reasons say “Signature flag set” rather than claiming a signature is still pending. Expired flagged notices remain visible as **expired**, not “overdue”; flagged notices with missing or malformed expiry dates show **Unknown**. Unread notices with expired, missing, or malformed expiry dates are not included unless a workflow flag is set.
+
+JSON output is an array of objects containing the original notice under `notice` and derived signals under `attention`:
+
+- `attention.reasons`: `participation_flag`, `reply_flag`, `file_submission_flag`, `signature_flag`, `unread`, and/or `expires_soon`.
+- `attention.days_until_expiry`: calendar days remaining, negative for expired notices, or `null` for unknown expiry.
+
+This is a **heuristic review queue**, not a definitive task list: all-false workflow flags do not prove no work is required, reading does not mean completion, and publication expiry may differ from an action deadline in the content. The command only lists notices; it does not mark them read, download attachments, or perform actions. `noticeboards list` retains its existing behavior and output shape.
+
 Download noticeboard attachments:
 
 ```shell
